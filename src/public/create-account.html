@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Main page; forces the user to login. Otherwise redirects to the play now page. -->
+<!-- Allows account creation. -->
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>TinyType: Login</title>
+        <title>TinyType: Create an Account</title>
         <link rel="icon" href="" />
         <link rel="stylesheet" href="/res/main.css" />
     </head>
@@ -15,27 +15,28 @@
             <nav>
                 <menu>
                     <!-- No other pages available until logged in. -->
-                    <li><a href="#">Login</a></li>
+                    <li><a href="/">Login</a></li>
                 </menu>
             </nav>
         </header>
         <main>
-            <form method="get" action="/game.html">
+            <form method="get" action="/">
                 <fieldset>
-                    <legend>Login</legend>
+                    <legend>Create an Account</legend>
                     <div>
                         <label for="user-email">Email:</label>
                         <input type="email" id="user-email" name="user-email" placeholder="Email" />
+                    </div>
+                    <div>
+                        <label for="user-password">Username:</label>
+                        <input type="text" id="user-name" name="user-name" placeholder="Username" />
                     </div>
                     <div>
                         <label for="user-password">Password:</label>
                         <input type="password" id="user-password" name="user-password" placeholder="Password" />
                     </div>
                     <div>
-                        <a href="/create-account.html">Create an account</a>
-                    </div>
-                    <div>
-                        <input type="submit" value="Login" />
+                        <input type="submit" value="Register" />
                         <input type="reset" value="Clear" />
                     </div>
                 </fieldset>
