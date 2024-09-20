@@ -46,3 +46,14 @@ Required technologies will be used in the following ways:
   * scores - Gets both user high scores and global high scores.
 * DB/Login - Stores registered users and high scores for users.
 * WebSocket - Pushes "motivational messages" to users currently playing as other users submit high scores.
+
+## HTML Deliverable
+- [x] **HTML pages** - 5 pages created including: login (main page), account creation, main game, high scores, about.
+- [x] **HTML elements** - HTML elements are used appropriately.
+- [x] **Links** - The nav menu links between pages. Some external links are included (footer, about pages).
+- [x] **Text** - The about page contains two paragraphs text. Text is also scattered throughout the app.
+- [x] **Service calls** - The placeholder for a service call is shown on the main game page (gets prompt text from Wikipedia).
+- [x] **Images** - A logo is included as a favicon and is shown on the about page.
+- [x] **Login** - A login and account creation page are included. A placeholder for the username is included.
+- [x] **Database** - A placeholder and template for database content is included on the high scores page.
+- [x] **WebSocket** - A placeholder and template for a websocket-driven notification is included on the main page.
