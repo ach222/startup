@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<!-- Main page; forces the user to login. Otherwise redirects to the play now page. -->
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>TinyTyper: Login</title>
+        <link rel="icon" href="" />
+    </head>
+
+    <body>
+        <header>
+            <h1>TinyTyper</h1>
+            <nav>
+                <menu>
+                    <!-- No other pages available until logged in. -->
+                    <li><a href="#">Login</a></li>
+                </menu>
+            </nav>
+        </header>
+        <main>
+            <form method="get" action="game.html">
+                <fieldset>
+                    <legend>Login</legend>
+                    <div>
+                        <label for="user-email">Email:</label>
+                        <input type="email" id="user-email" name="user-email" placeholder="email" />
+                    </div>
+                    <div>
+                        <label for="user-password">Password:</label>
+                        <input type="password" id="user-password" name="user-password" placeholder="password" />
+                    </div>
+                    <div>
+                        <input type="submit" value="Submit" />
+                        <input type="button" value="Clear" />
+                    </div>
+                </fieldset>
+            </form>
+        </main>
+
+        <footer>
+            Written by <a href="https://github.com/ach222">Alden Howard</a>.
+        </footer>
+    </body>
+</html>
