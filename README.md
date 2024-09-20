@@ -1,9 +1,12 @@
 # TinyType
 
-See notes [here](./notes.md).
+![TinyType Logo](./resources/logo.png)
 
 ## Access the Project
-[https://cs260fullstack.click](https://cs260fullstack.click)
+[https://startup.cs260fullstack.click](https://startup.cs260fullstack.click)
+
+## Course Notes
+See notes [here](./notes.md).
 
 ## Specification Deliverable
 
