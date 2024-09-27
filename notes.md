@@ -94,3 +94,41 @@ div {
   grid-auto-rows: 300px;
 }
 ```
+
+## JS
+
+### Strings
+* `length` (attr; not function)
+* `indexOf`
+* `split`
+* `startsWith`
+* `endsWith`
+* `toLowerCase`
+
+### Arrays
+* `push`
+* `pop`
+* `slice`
+* `sort`
+* `values`
+* `find`
+* `forEach`
+* `reduce`
+* `map`
+* `filter`
+* `every`
+* `some`
+
+### Regex
+* `str.match(exp)` -> `["match1", ...]`
+* `str.replace(exp, val)`
+* `str.test(exp)` -> `true/false`
+
+### DOM
+* `querySelector[All]()`
+
+### LocalStorage
+* `getItem(key)`
+* `setItem(key, value)`
+* `removeItem(key)`
+* `clear()`

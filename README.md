@@ -57,3 +57,13 @@ Required technologies will be used in the following ways:
 - [x] **Login** - A login and account creation page are included. A placeholder for the username is included.
 - [x] **Database** - A placeholder and template for database content is included on the high scores page.
 - [x] **WebSocket** - A placeholder and template for a websocket-driven notification is included on the main page.
+
+## CSS Deliverable
+CSS Has been added and application now has a consistent look-and-feel.
+
+- [x] **Header, footer, and main content body** - All present and using flexbox.
+- [x] **Navigation elements** - Implemented bootstrap navbar.
+- [x] **Responsive to window resizing** - This site isn't really meant for mobile (it is a typing game), but the app reflows to a mobile-friendly layout when the screen size goes below 550px;
+- [x] **Application elements** - Application elements are styled with a clean look and good padding.
+- [x] **Application text content** - Text in the game is faded out once it has been typed.
+- [x] **Application images** - The image is floated to the left on the about page so the text can wrap around it.
