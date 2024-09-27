@@ -19,13 +19,21 @@ header {
     flex: 0 0 0;
 }
 
+div.nav-filler {
+    flex: 1 0 0;
+}
+
 main {
     flex: 1 0 0;
 
     overflow-y: auto;
 }
 
-div.centered-content {
+.padded-content {
+    padding: 8px;
+}
+
+.centered-content {
     display: flex;
     flex-flow: column nowrap;
 
@@ -36,7 +44,7 @@ div.centered-content {
 }
 
 @media (width >= 550px) and (height >= 550px) {
-    div.centered-content {
+    .centered-content {
         justify-content: center;
         align-items: center;
     }
@@ -46,7 +54,7 @@ div.centered-content {
     padding: 8px;
 }
 
-.centered-form-container > form > fieldset > legend {
+.centered-form-container > form > fieldset > legend, .centered-form-container h3 {
     border-bottom: 1px solid #777777;
 
     margin: 0 -8px 8px -8px;
@@ -80,8 +88,6 @@ footer {
 
     padding: 8px;
 
-    border-top: 1px solid #777777;
-
     overflow: hidden;
 }
 
@@ -89,4 +95,10 @@ footer > span {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+}
+
+.js-placeholder {
+    font-weight: bold;
+    color: blue;
+    text-decoration: none;
 }
