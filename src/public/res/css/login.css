@@ -1,0 +1,45 @@
+section#login-container {
+    padding: 8px;
+}
+
+section#login-container > form > fieldset > legend {
+    border-bottom: 1px solid #777777;
+
+    margin: 0 -8px 8px -8px;
+    padding: 0 8px 8px 8px;
+
+    width: calc(100% + calc(8px * 2));
+}
+
+section#get-code {
+    padding: 8px;
+}
+
+section#get-code > p {
+    margin: 0;
+}
+
+@media (width >= 550px) {
+    section#login-container {
+        width: 500px;
+
+        border: 1px solid #777777;
+        border-radius: 8px;
+    }
+
+    section#get-code {
+        border: 1px solid #777777;
+        border-radius: 8px;
+    }
+}
+
+@media (width < 550px) {
+    section#login-container {
+        width: 100%;
+    }
+
+    section#get-code {
+        border-top: 1px solid #777777;
+    }
+    
+}
