@@ -35,10 +35,39 @@ div.centered-content {
     gap: 8px;
 }
 
-@media (width >= 550px) {
+@media (width >= 550px) and (height >= 550px) {
     div.centered-content {
         justify-content: center;
         align-items: center;
+    }
+}
+
+.centered-form-container {
+    padding: 8px;
+}
+
+.centered-form-container > form > fieldset > legend {
+    border-bottom: 1px solid #777777;
+
+    margin: 0 -8px 8px -8px;
+    padding: 0 8px 8px 8px;
+
+    width: calc(100% + calc(8px * 2));
+}
+
+@media (width >= 550px) and (height >= 550px) {
+    .centered-form-container {
+        width: 500px;
+
+        border: 1px solid #777777;
+        border-radius: 8px;
+    }
+}
+
+
+@media (width < 550px) and (height >= 550px) {
+    .centered-form-container {
+        width: 100%;
     }
 }
 

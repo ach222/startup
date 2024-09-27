@@ -12,44 +12,52 @@
 
     <body>
         <header>
-            <h1>TinyType</h1>
-            <nav>
-                <menu>
-                    <!-- No other pages available until logged in. -->
-                    <li><a href="/">Login</a></li>
-                    <li><a href="/about.html">About</a></li>
-                </menu>
+            <nav class="navbar navbar-expand-sm bg-body-tertiary">
+                <div class="container-fluid">
+                    <a href="/" class="navbar-brand">TinyType</a>
+                    <div class="navbar-collapse">
+                        <ul class="navbar-nav">
+                            <!-- No other pages available until logged in. -->
+                            <li class="nav-item"><a href="/" class="nav-link">Login</a></li>
+                            <li class="nav-item"><a href="/about.html" class="nav-link">About</a></li>
+                        </ul>
+                    </div>
+                </div>
             </nav>
         </header>
+
         <main>
-            <section>
-                <form method="get" action="/">
-                    <fieldset>
-                        <legend>Create an Account</legend>
-                        <div>
-                            <label for="user-email">Email:</label>
-                            <input type="email" id="user-email" name="user-email" placeholder="Email" required />
-                        </div>
-                        <div>
-                            <label for="user-password">Username:</label>
-                            <input type="text" id="user-name" name="user-name" placeholder="Username" required />
-                        </div>
-                        <div>
-                            <label for="user-password">Password:</label>
-                            <input type="password" id="user-password" name="user-password" placeholder="Password" required />
-                        </div>
-                        <div>
-                            <input type="submit" value="Register" />
-                            <input type="reset" value="Clear" />
-                        </div>
-                    </fieldset>
-                </form>
-            </section>
+            <div class="centered-content">
+                <section class="centered-form-container">
+                    <form method="get" action="/">
+                        <fieldset>
+                            <legend>Create an Account</legend>
+                            <div class="mb-3">
+                                <label class="form-label" for="user-email">Email</label>
+                                <input type="email" class="form-control" id="user-email" name="user-email" placeholder="Email" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="user-password">Username</label>
+                                <input type="text" class="form-control" id="user-name" name="user-name" placeholder="Username" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="user-password">Password</label>
+                                <input type="password" class="form-control" id="user-password" name="user-password" placeholder="Password" required />
+                            </div>
+                            <div>
+                                <input type="submit" class="btn btn-primary" value="Register" />
+                                <a href="/" class="btn btn-link">Login instead</a>
+                            </div>
+                        </fieldset>
+                    </form>
+                </section>
+            </div>
         </main>
 
         <footer>
-            <hr />
-            Written by <a href="https://github.com/ach222">Alden Howard</a>. Get the source code <a href="https://github.com/ach222/startup">here</a>.
+            <span>
+                Written by <a href="https://github.com/ach222">Alden Howard</a>. Get the source code <a href="https://github.com/ach222/startup">here</a>.
+            </span>
         </footer>
     </body>
 </html>
