@@ -8,13 +8,15 @@ section#get-code > p {
 
 @media (width >= 550px) and (height >= 550px) {
     section#get-code {
-        border: 1px solid #777777;
+        border: 1px solid var(--color-border);
         border-radius: 8px;
+
+        box-shadow: 0 0 16px -4px var(--color-fg);
     }
 }
 
-@media (width < 550px) and (height >= 550px) {
+@media (width < 550px) or (height < 550px) {
     section#get-code {
-        border-top: 1px solid #777777;
+        border-top: 1px solid var(--color-border);
     }
 }
