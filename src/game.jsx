@@ -59,7 +59,13 @@ function Game({ authState, gameMode, onComplete }) {
   // Load the prompt (HTTP mock).
   useEffect(() => {
     (async () => {
-      setPrompt(await withRandomDelay(() => "This is a test", 1000));
+      setPrompt(
+        await withRandomDelay(
+          () =>
+            "This is a mock prompt, feel free to type this to try the game out!",
+          1000
+        )
+      );
     })();
   }, []);
 

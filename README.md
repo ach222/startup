@@ -59,7 +59,7 @@ Required technologies will be used in the following ways:
 - [x] **WebSocket** - A placeholder and template for a websocket-driven notification is included on the main page.
 
 ## CSS Deliverable
-CSS Has been added and application now has a consistent look-and-feel.
+CSS has been added and application now has a consistent look-and-feel.
 
 - [x] **Header, footer, and main content body** - All present and using flexbox.
 - [x] **Navigation elements** - Implemented bootstrap navbar.
@@ -67,3 +67,14 @@ CSS Has been added and application now has a consistent look-and-feel.
 - [x] **Application elements** - Application elements are styled with a clean look and good padding.
 - [x] **Application text content** - Text in the game is faded out once it has been typed.
 - [x] **Application images** - The image is floated to the left on the about page so the text can wrap around it.
+
+## React Deliverable
+React functionality has been added and application now functions (client-only).
+
+- [x] **Bundled and transpiled** - Done!
+- [x] **Components** - Two components (aside from pages) were created: `Loader` and `Notification`.
+  - [x] **Login/Register** - State stored in local storage.
+  - [x] **Game** - Game is fully functional client side. It uses a mock prompt for now (eventually to be fetched from Wikipedia when the backend is implemented). Notifications are shown from a mock WebSocket that toggles visibility every 5 seconds.
+  - [x] **Scores** - Static scores data is mocked out.
+- [x] **Router** - Pages are all routed using `react-router`.
+- [x] **Hooks** - Most pages use hooks, see `./src/game.jsx` for many of them. One example would be using `useState()` in `./src/app.jsx` to store login state.
