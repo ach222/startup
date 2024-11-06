@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import {
@@ -17,19 +17,28 @@ import NotFoundPage from "./not-found";
 import ScoresPage from "./scores";
 
 export default function App() {
-  const [authState, setAuthState] = useState(
-    JSON.parse(
-      window.localStorage.getItem("authState") ??
-        JSON.stringify({
-          isLoggedIn: false,
-        })
-    )
-  );
+  const [authState, setAuthState] = useState(null);
+
+  // Load the auth state (HTTP mock).
+  useEffect(() => {
+    const loadedAuthState = window.localStorage.getItem("authState");
+
+    if (loadedAuthState === null || loadedAuthState === "") {
+      setAuthState({
+        isLoggedIn: false,
+      });
+
+      return;
+    }
+
+    setAuthState(JSON.parse(loadedAuthState));
+  }, []);
 
   const onLogin = useCallback((username) => {
     const newAuthState = {
       isLoggedIn: true,
       username,
+      highScoreWPM: 10,
     };
 
     window.localStorage.setItem("authState", JSON.stringify(newAuthState));
@@ -44,6 +53,10 @@ export default function App() {
     window.localStorage.setItem("authState", JSON.stringify(newAuthState));
     setAuthState(newAuthState);
   }, []);
+
+  if (authState === null) {
+    return null;
+  }
 
   return (
     <BrowserRouter>
@@ -146,7 +159,11 @@ export default function App() {
         <Route
           path="/game"
           element={
-            authState.isLoggedIn ? <GamePage /> : <Navigate to="/login" />
+            authState.isLoggedIn ? (
+              <GamePage authState={authState} />
+            ) : (
+              <Navigate to="/login" />
+            )
           }
           exact
         />

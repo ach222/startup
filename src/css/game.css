@@ -3,72 +3,33 @@ main {
     overflow: hidden;
 }
 
-div.notification {
-    position: absolute;
-
-    right: 0;
-
-    padding: 8px;
-
-    background-color: var(--color-bg);
-
-    z-index: 1;
-
-    animation: notify-slide 550ms linear;
-}
-
-div.notification div.close-btn {
-    margin: 0 -8px 8px -8px;
-    padding: 0 8px 8px 8px;
-
-    width: calc(100% + calc(8px * 2));
-    
-    border-bottom: 1px solid var(--color-border);
-}
-
-div.notification div.close-btn > a {
-    color: inherit;
-
-    text-decoration: none;
-}
-
-@media (width >= 550px) and (height >= 550px) {
-    div.notification {
-        width: 350px;
-
-        bottom: 64px;
-
-        border: 1px solid var(--color-border);
-        border-radius: 4px 0 0 4px;
-
-        box-shadow: 0 0 16px -4px var(--color-fg);
-    }
-}
-
-@media (width < 550px) or (height < 550px) {
-    div.notification {
-        width: 100%;
-
-        border: 1px solid var(--color-border);
-        bottom: 0px;
-    }
-}
-
-@keyframes notify-slide {
-    from {
-        transform: translateX(100%);
-    }
-
-    to {
-        transform: translateX(0%);
-    }
+div.game-mode-selection-container {
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 8px;
 }
 
 input[type="text"]#typing-input {
     width: 100%;
 }
 
-span.text-typed {
+span.text {
     width: 100%;
+}
+
+span.text.valid {
+    color: var(--color-valid);
+}
+
+span.text.extra {
+    text-decoration: line-through;
     color: var(--color-disabled);
+}
+
+span.text.invalid {
+    color: var(--color-invalid);
+}
+
+span.text.untyped {
+    color: var(--color-fg);
 }

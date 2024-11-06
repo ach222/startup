@@ -4,6 +4,8 @@
     --color-nav: #eeeeee;
     --color-border: #777777;
     --color-disabled: #cccccc;
+    --color-valid: #00cc00;
+    --color-invalid: #cc0000;
 }
 
 html, body, div#root {
