@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import { MODE_EASY, MODE_HARD, MODE_TO_TEXT } from "./constants";
 import "./css/game.css";
@@ -214,16 +214,16 @@ function GameWithPrompt({ authState, gameMode, prompt, onComplete }) {
     ];
   }, [fragments, promptParts]);
 
-  // Same number of words and the last word is fully typed
+  // Same number of words and the last word is fully typed or more typed words than prompt words.
   const hasWinner =
-    typedTextParts.length >= promptParts.length &&
-    typedTextParts[typedTextParts.length - 1].length >=
-      promptParts[promptParts.length - 1].length;
+    (typedTextParts.length == promptParts.length &&
+      typedTextParts[typedTextParts.length - 1].length >=
+        promptParts[promptParts.length - 1].length) ||
+    typedTextParts.length > promptParts.length;
 
   const [wpm, setWPM] = useState(0);
 
-  const updateWPMRef = useRef(() => null);
-  updateWPMRef.current = () => {
+  const updateWPM = useCallback(() => {
     if (startTime === -1) {
       return;
     }
@@ -233,34 +233,47 @@ function GameWithPrompt({ authState, gameMode, prompt, onComplete }) {
     const dtMin = (Date.now() - startTime) / 1000 / 60;
 
     setWPM(numWordsCorrect / dtMin);
-  };
+  }, [numCharsCorrect, startTime]);
 
-  // Update the WPM every second
+  // Update the WPM every second or when the typed text changes
   useEffect(() => {
     // Stop the timer and do a final WPM update on winner.
     if (hasWinner) {
-      updateWPMRef.current();
-      return;
+      updateWPM();
+      return () => null;
     }
 
-    const intervalId = window.setInterval(() => updateWPMRef.current(), 1000);
-    return () => window.clearInterval(intervalId);
-  }, [hasWinner]);
+    let intervalId = -1;
 
-  // Start the timer and update the WPM when the fragments change
+    const updateLoop = () => {
+      updateWPM();
+      intervalId = window.setTimeout(updateLoop, 1000);
+    };
+
+    intervalId = window.setTimeout(updateLoop, 1000);
+
+    return () => {
+      if (intervalId === -1) {
+        return;
+      }
+
+      window.clearTimeout(intervalId);
+    };
+  }, [hasWinner, updateWPM]);
+
+  // Start the timer and recompute the WPM when the fragments change
   useEffect(() => {
     if (startTime === -1) {
       setStartTime(Date.now());
     }
 
-    updateWPMRef.current();
+    updateWPM();
   }, [fragments, startTime]);
 
   const [motivationalMessage, setMotivationalMessage] = useState(null);
 
   // Websocket mock
-  const updateMotivationalMessageRef = useRef(() => null);
-  updateMotivationalMessageRef.current = () => {
+  const updateMotivationalMessage = useCallback(() => {
     if (motivationalMessage === null) {
       setMotivationalMessage(
         'This is a motivational message! Placeholder: WebSocket (sample notification; "encouraging" score goes here)'
@@ -268,7 +281,32 @@ function GameWithPrompt({ authState, gameMode, prompt, onComplete }) {
     } else {
       setMotivationalMessage(null);
     }
-  };
+  }, [motivationalMessage]);
+
+  useEffect(() => {
+    // Stop the timer and hide the message on winner.
+    if (hasWinner) {
+      setMotivationalMessage(null);
+      return () => null;
+    }
+
+    let intervalId = -1;
+
+    const updateLoop = () => {
+      updateMotivationalMessage();
+      intervalId = window.setTimeout(updateLoop, 5000);
+    };
+
+    intervalId = window.setTimeout(updateLoop, 5000);
+
+    return () => {
+      if (intervalId === -1) {
+        return;
+      }
+
+      window.clearTimeout(intervalId);
+    };
+  }, [hasWinner, updateMotivationalMessage]);
 
   useEffect(() => {
     // Stop the timer and hide the message on winner.
