@@ -1,7 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-export default function LoginPage() {
+export default function LoginPage({ onLogin }) {
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  let submitBtnClasses = "btn btn-primary";
+  if (email === "" || username === "" || password === "") {
+    submitBtnClasses += " disabled";
+  }
+
   return (
     <main className="centered-content">
       <section className="centered-form-container">
@@ -19,6 +28,8 @@ export default function LoginPage() {
                 name="user-email"
                 placeholder="Email"
                 required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div className="mb-3">
@@ -32,6 +43,8 @@ export default function LoginPage() {
                 name="user-name"
                 placeholder="Username"
                 required
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
             </div>
             <div className="mb-3">
@@ -45,13 +58,16 @@ export default function LoginPage() {
                 name="user-password"
                 placeholder="Password"
                 required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             <div>
               <input
                 type="submit"
-                className="btn btn-primary"
+                className={submitBtnClasses}
                 value="Register"
+                onClick={() => onLogin(email.split("@")[0])}
               />
               <Link to="/" className="btn btn-link">
                 Login instead

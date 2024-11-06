@@ -1,9 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { Link } from "react-router-dom";
 import "./css/login.css";
 
-export default function LoginPage() {
+export default function LoginPage({ onLogin }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  let submitBtnClasses = "btn btn-primary";
+  if (email === "" || password === "") {
+    submitBtnClasses += " disabled";
+  }
+
   return (
     <main className="centered-content">
       <section className="centered-form-container">
@@ -21,6 +29,8 @@ export default function LoginPage() {
                 name="user-email"
                 placeholder="Email"
                 required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div className="mb-3">
@@ -34,10 +44,17 @@ export default function LoginPage() {
                 name="user-password"
                 placeholder="Password"
                 required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             <div>
-              <input type="submit" className="btn btn-primary" value="Login" />
+              <input
+                type="button"
+                className={submitBtnClasses}
+                value="Login"
+                onClick={() => onLogin(email.split("@")[0])}
+              />
               <Link to="/create-account" className="btn btn-link">
                 Create an Account
               </Link>

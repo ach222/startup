@@ -1,8 +1,78 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
+import { Spinner } from "react-bootstrap";
 import "./css/scores.css";
 
 export default function ScoresPage() {
+  const [personalHighScores, setPersonalHighScores] = useState(null);
+  const [topEasyHighScores, setTopEasyHighScores] = useState(null);
+  const [topHardHighScores, setTopHardHighScores] = useState(null);
+
+  // Fetch scores
+  useEffect(() => {
+    (async () => {
+      setPersonalHighScores(
+        await withRandomDelay(
+          () => [
+            { mode: "easy", score: 128 },
+            { mode: "hard", score: 122 },
+          ],
+          2000
+        )
+      );
+    })();
+
+    (async () => {
+      setTopEasyHighScores(
+        await withRandomDelay(
+          () => [
+            { username: "byustudent1", score: 128 },
+            { username: "byustudent2", score: 122 },
+          ],
+          2000
+        )
+      );
+    })();
+
+    (async () => {
+      setTopHardHighScores(
+        await withRandomDelay(
+          () => [
+            { username: "byustudent1", score: 128 },
+            { username: "byustudent2", score: 122 },
+          ],
+          2000
+        )
+      );
+    })();
+  }, []);
+
+  if (
+    personalHighScores === null ||
+    topEasyHighScores === null ||
+    topHardHighScores === null
+  ) {
+    return (
+      <main className="centered-content">
+        <Spinner animation="border" />
+      </main>
+    );
+  }
+
+  return (
+    <LoadedScoresPage
+      personalHighScores={personalHighScores}
+      topEasyHighScores={topEasyHighScores}
+      topHardHighScores={topHardHighScores}
+    />
+  );
+}
+
+function LoadedScoresPage({
+  personalHighScores,
+  topEasyHighScores,
+  topHardHighScores,
+}) {
   return (
     <main className="padded-content">
       <section className="js-placeholder">

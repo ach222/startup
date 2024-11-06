@@ -32,7 +32,7 @@ IP (elastic): [34.238.238.39](http://34.238.238.39)
 
 Valid input types: text\*, password\*, email\*, tel\*, url\*, search\*, number, checkbox, radio, range, date, datetime-local, month, week, color, file, submit.
 
-\* - Supports `pattern`. 
+\* - Supports `pattern`.
 
 Inputs can have `required`, `placeholder`.
 
@@ -132,3 +132,9 @@ div {
 * `setItem(key, value)`
 * `removeItem(key)`
 * `clear()`
+
+### express.js
+* `app = express();`
+* `app.listen(<port>);`
+* `app.<method>((req, res, next) => void);`
+* Middleware - `app.use()` - `(req, res, next) => void`, `(error, req, res, next) => void`, `express.static(<dir>)`
