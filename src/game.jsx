@@ -2,8 +2,9 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import { MODE_EASY, MODE_HARD, MODE_TO_TEXT } from "./constants";
 import "./css/game.css";
-import Loader from "./Loader";
+import Loader, { MainLoader } from "./Loader";
 import Notification from "./Notification";
+import { getMockScores } from "./scores";
 import { withRandomDelay } from "./utils";
 
 const CHAR_VALID = "valid";
@@ -11,7 +12,7 @@ const CHAR_EXTRA = "extra";
 const CHAR_INVALID = "invalid";
 const CHAR_UNTYPED = "untyped";
 
-export default function GamePage({ authState }) {
+export default function GamePage() {
   const [selectedGameMode, setSelectedGameMode] = useState(null);
 
   const onNewGame = () => {
@@ -43,17 +44,13 @@ export default function GamePage({ authState }) {
           </section>
         </div>
       ) : (
-        <Game
-          authState={authState}
-          gameMode={selectedGameMode}
-          onComplete={onNewGame}
-        />
+        <Game gameMode={selectedGameMode} onComplete={onNewGame} />
       )}
     </main>
   );
 }
 
-function Game({ authState, gameMode, onComplete }) {
+function Game({ gameMode, onComplete }) {
   const [prompt, setPrompt] = useState(null);
 
   // Load the prompt (HTTP mock).
@@ -70,12 +67,11 @@ function Game({ authState, gameMode, onComplete }) {
   }, []);
 
   if (prompt === null) {
-    return <Loader />;
+    return <MainLoader />;
   }
 
   return (
     <GameWithPrompt
-      authState={authState}
       prompt={prompt}
       gameMode={gameMode}
       onComplete={onComplete}
@@ -83,7 +79,7 @@ function Game({ authState, gameMode, onComplete }) {
   );
 }
 
-function GameWithPrompt({ authState, gameMode, prompt, onComplete }) {
+function GameWithPrompt({ gameMode, prompt, onComplete }) {
   const [startTime, setStartTime] = useState(-1);
 
   const promptParts = useMemo(
@@ -331,12 +327,9 @@ function GameWithPrompt({ authState, gameMode, prompt, onComplete }) {
             Your score was {Math.round(wpm)} WPM with an accuracy of{" "}
             {Math.round(percentCorrect * 100)}%!
           </p>
-          {wpm >= authState.highScoreWPM && (
-            <p>
-              You beat your high score WPM of{" "}
-              {Math.round(authState.highScoreWPM)}!
-            </p>
-          )}
+          <p>
+            <GameCompletionHighScore wpm={wpm} gameMode={gameMode} />
+          </p>
           <button
             type="button"
             className="btn btn-primary"
@@ -387,5 +380,46 @@ function GameWithPrompt({ authState, gameMode, prompt, onComplete }) {
         />
       )}
     </div>
+  );
+}
+
+/**
+ * Tells the player if they have beaten any high scores.
+ */
+function GameCompletionHighScore({ wpm, gameMode }) {
+  const [highScores, setHighScores] = useState(null);
+
+  // Fetch scores (HTTP mock).
+  useEffect(() => {
+    (async () => {
+      setHighScores(await withRandomDelay(getMockScores, 2000));
+    })();
+  }, []);
+
+  if (highScores === null) {
+    return <Loader />;
+  }
+
+  const globalScores =
+    gameMode === MODE_EASY ? highScores.topEasy : highScores.topHard;
+
+  const beatenPersonalScores = highScores.personal.filter(
+    (highScore) => wpm > highScore.scoreWPM
+  );
+  const beatenGlobalScores = globalScores.filter(
+    (highScore) => wpm > highScore.scoreWPM
+  );
+
+  return (
+    <>
+      {beatenGlobalScores.length > 0 && <p>You set a new global high score!</p>}
+      {beatenPersonalScores.length > 0 && (
+        <p>You set a new personal high score!</p>
+      )}
+      {beatenPersonalScores.length === 0 &&
+        beatenPersonalScores.length === 0 && (
+          <p>You didn't set any high scores this time.</p>
+        )}
+    </>
   );
 }

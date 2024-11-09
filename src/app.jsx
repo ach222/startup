@@ -12,6 +12,7 @@ import AboutPage from "./about";
 import CreateAccountPage from "./create-account";
 import "./css/main.css";
 import GamePage from "./game";
+import { MainLoader } from "./Loader";
 import LoginPage from "./login";
 import NotFoundPage from "./not-found";
 import ScoresPage from "./scores";
@@ -38,7 +39,6 @@ export default function App() {
     const newAuthState = {
       isLoggedIn: true,
       username,
-      highScoreWPM: 10,
     };
 
     window.localStorage.setItem("authState", JSON.stringify(newAuthState));
@@ -55,7 +55,7 @@ export default function App() {
   }, []);
 
   if (authState === null) {
-    return null;
+    return <MainLoader />;
   }
 
   return (
