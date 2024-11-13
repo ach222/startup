@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
+import { Link } from "react-router-dom";
 import { MODE_EASY, MODE_HARD, MODE_TO_TEXT } from "./constants";
 import "./css/game.css";
 import Loader, { MainLoader } from "./Loader";
 import Notification from "./Notification";
-import { getMockScores } from "./scores";
-import { withRandomDelay } from "./utils";
 
 const CHAR_VALID = "valid";
 const CHAR_EXTRA = "extra";
@@ -56,13 +55,17 @@ function Game({ gameMode, onComplete }) {
   // Load the prompt (HTTP mock).
   useEffect(() => {
     (async () => {
-      setPrompt(
-        await withRandomDelay(
-          () =>
-            "This is a mock prompt, feel free to type this to try the game out!",
-          1000
-        )
-      );
+      try {
+        const response = await fetch(`/api/prompt?gameMode=${gameMode}`);
+        const json = await response.json();
+        if (response.status === 200) {
+          setPrompt(json);
+        } else {
+          console.error("An unknown error occured.");
+        }
+      } catch {
+        console.error("An unknown error occured.");
+      }
     })();
   }, []);
 
@@ -83,8 +86,8 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
   const [startTime, setStartTime] = useState(-1);
 
   const promptParts = useMemo(
-    () => prompt.split(" ").filter((it) => it !== ""),
-    [prompt]
+    () => prompt.text.split(" ").filter((it) => it !== ""),
+    [prompt.text]
   );
 
   const [typedText, setTypedText] = useState("");
@@ -330,13 +333,19 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
           <p>
             <GameCompletionHighScore wpm={wpm} gameMode={gameMode} />
           </p>
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={onComplete}
-          >
-            New game
-          </button>
+
+          <div>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={onComplete}
+            >
+              New game
+            </button>
+            <Link to="/scores" className="btn btn-link">
+              High Scores
+            </Link>
+          </div>
         </section>
       </div>
     );
@@ -369,7 +378,11 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
             {uiFragments}
             <span className="text-typed"></span>
           </p>
-          <p className="js-placeholder">Placeholder: Third-Party Service</p>
+          <p className="caption">
+            Text courtesy of <a href="https://wikimedia.org">Wikimedia</a>. This
+            excerpt comes from the article titled{" "}
+            <a href={prompt.link}>{prompt.title}</a>.
+          </p>
         </div>
       </section>
 
@@ -387,37 +400,47 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
  * Tells the player if they have beaten any high scores.
  */
 function GameCompletionHighScore({ wpm, gameMode }) {
-  const [highScores, setHighScores] = useState(null);
+  const [didSetHighScores, setDidSetHighScores] = useState(null);
 
-  // Fetch scores (HTTP mock).
+  // Submit score
   useEffect(() => {
     (async () => {
-      setHighScores(await withRandomDelay(getMockScores, 2000));
+      try {
+        const response = await fetch("/api/scores", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            gameMode,
+            scoreWPM: wpm,
+          }),
+        });
+
+        const json = await response.json();
+        if (response.status === 200) {
+          setDidSetHighScores(json);
+        } else {
+          console.error("An unknown error occured.");
+        }
+      } catch {
+        console.error("An unknown error occured.");
+      }
     })();
   }, []);
 
-  if (highScores === null) {
+  if (didSetHighScores === null) {
     return <Loader />;
   }
 
-  const globalScores =
-    gameMode === MODE_EASY ? highScores.topEasy : highScores.topHard;
-
-  const beatenPersonalScores = highScores.personal.filter(
-    (highScore) => wpm > highScore.scoreWPM
-  );
-  const beatenGlobalScores = globalScores.filter(
-    (highScore) => wpm > highScore.scoreWPM
-  );
-
   return (
     <>
-      {beatenGlobalScores.length > 0 && <p>You set a new global high score!</p>}
-      {beatenPersonalScores.length > 0 && (
+      {didSetHighScores.didSetGlobalHighScore && (
+        <p>You set a new global high score!</p>
+      )}
+      {didSetHighScores.didSetPersonalHighScore && (
         <p>You set a new personal high score!</p>
       )}
-      {beatenPersonalScores.length === 0 &&
-        beatenPersonalScores.length === 0 && (
+      {!didSetHighScores.didSetGlobalHighScore &&
+        !didSetHighScores.didSetPersonalHighScore && (
           <p>You didn't set any high scores this time.</p>
         )}
     </>

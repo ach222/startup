@@ -124,6 +124,10 @@ footer > span {
     text-decoration: none;
 }
 
-span.error {
+.error {
     color: var(--color-error);
+}
+
+.caption {
+    font-size: 0.8em;
 }

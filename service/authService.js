@@ -1,21 +1,9 @@
-const { MongoClient } = require("mongodb");
-const dbConfig = require("./secrets/dbconfig");
+const { startupDb } = require("./db");
+
 const uuid = require("uuid");
 const bcrypt = require("bcrypt");
 
-const dbClient = new MongoClient(dbConfig.url);
-const startupDb = dbClient.db("startup");
 const usersCollection = startupDb.collection("users");
-
-async function ensureDB() {
-  try {
-    await dbClient.connect();
-    await startupDb.command({ ping: 1 });
-  } catch (e) {
-    console.error(`Could not connect to db because ${e.message}.`);
-    process.exit(1);
-  }
-}
 
 function newToken() {
   return uuid.v4();
@@ -69,14 +57,13 @@ async function loginUser(email, password) {
 
   const newSessionToken = newToken();
 
-  await usersCollection.updateOne(
+  return await usersCollection.findOneAndUpdate(
     { _id: resultingUser._id },
     {
       $set: { sessionToken: newSessionToken },
-    }
+    },
+    { returnDocument: "after" }
   );
-
-  return { ...resultingUser, sessionToken: newSessionToken };
 }
 
 async function logoutUser(sessionToken) {
@@ -87,7 +74,6 @@ async function logoutUser(sessionToken) {
 }
 
 module.exports = {
-  ensureDB,
   newUser,
   getUserByEmail,
   getUserByUsername,
