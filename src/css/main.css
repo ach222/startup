@@ -6,6 +6,8 @@
     --color-disabled: #cccccc;
     --color-valid: #00cc00;
     --color-invalid: #cc0000;
+
+    --color-error: #cc0000;
 }
 
 html, body, div#root {
@@ -120,4 +122,8 @@ footer > span {
     font-weight: bold;
     color: blue;
     text-decoration: none;
+}
+
+span.error {
+    color: var(--color-error);
 }

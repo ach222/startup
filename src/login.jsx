@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 
 import { Link } from "react-router-dom";
 import "./css/login.css";
 
 export default function LoginPage({ onLogin }) {
+  const [errorText, setErrorText] = useState(null);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -12,12 +14,41 @@ export default function LoginPage({ onLogin }) {
     submitBtnClasses += " disabled";
   }
 
+  const handleLogin = useCallback(() => {
+    (async () => {
+      try {
+        const response = await fetch("/api/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email,
+            password,
+          }),
+        });
+
+        const json = await response.json();
+        if (response.status === 200) {
+          onLogin(json);
+        } else {
+          setErrorText(json.message);
+        }
+      } catch {
+        setErrorText("An unknown error occured.");
+      }
+    })();
+  }, [email, password, onLogin]);
+
   return (
     <main className="centered-content">
       <section className="centered-form-container">
-        <form method="get" action="/game.html">
+        <form>
           <fieldset>
             <legend>Login</legend>
+            {errorText !== null && (
+              <div className="mb-3">
+                <span className="error">{errorText}</span>
+              </div>
+            )}
             <div className="mb-3">
               <label className="form-label" htmlFor="user-email">
                 Email
@@ -53,7 +84,7 @@ export default function LoginPage({ onLogin }) {
                 type="button"
                 className={submitBtnClasses}
                 value="Login"
-                onClick={() => onLogin(email.split("@")[0])}
+                onClick={handleLogin}
               />
               <Link to="/create-account" className="btn btn-link">
                 Create an Account

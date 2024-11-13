@@ -22,36 +22,37 @@ export default function App() {
 
   // Load the auth state (HTTP mock).
   useEffect(() => {
-    const loadedAuthState = window.localStorage.getItem("authState");
-
-    if (loadedAuthState === null || loadedAuthState === "") {
-      setAuthState({
-        isLoggedIn: false,
-      });
-
-      return;
-    }
-
-    setAuthState(JSON.parse(loadedAuthState));
+    (async () => {
+      try {
+        const response = await fetch("/api/auth");
+        if (response.status === 200) {
+          const json = await response.json();
+          setAuthState({ isLoggedIn: true, ...json });
+        } else {
+          setAuthState({ isLoggedIn: false });
+        }
+      } catch {
+        setAuthState({ isLoggedIn: false });
+      }
+    })();
   }, []);
 
-  const onLogin = useCallback((username) => {
-    const newAuthState = {
-      isLoggedIn: true,
-      username,
-    };
-
-    window.localStorage.setItem("authState", JSON.stringify(newAuthState));
-    setAuthState(newAuthState);
+  const onLogin = useCallback((userData) => {
+    setAuthState({ isLoggedIn: true, ...userData });
   }, []);
 
-  const onLogout = useCallback((username) => {
-    const newAuthState = {
-      isLoggedIn: false,
-    };
-
-    window.localStorage.setItem("authState", JSON.stringify(newAuthState));
-    setAuthState(newAuthState);
+  const handleLogout = useCallback(() => {
+    (async () => {
+      try {
+        const response = await fetch("/api/auth", { method: "DELETE" });
+        if (response.status === 200) {
+          setAuthState({ isLoggedIn: false });
+        }
+      } catch {
+        // Do nothing
+        console.error("An error occured logging you out.");
+      }
+    })();
   }, []);
 
   if (authState === null) {
@@ -111,7 +112,7 @@ export default function App() {
               <ul className="navbar-nav">
                 {authState.isLoggedIn && (
                   <li className="nav-item">
-                    <a href="#" className="nav-link" onClick={onLogout}>
+                    <a href="#" className="nav-link" onClick={handleLogout}>
                       {authState.username} - Logout
                     </a>
                   </li>

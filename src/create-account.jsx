@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function LoginPage({ onLogin }) {
+  const [errorText, setErrorText] = useState(null);
+
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -11,12 +13,41 @@ export default function LoginPage({ onLogin }) {
     submitBtnClasses += " disabled";
   }
 
+  const handleCreateAccount = useCallback(() => {
+    (async () => {
+      try {
+        const response = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email,
+            username,
+            password,
+          }),
+        });
+        const json = await response.json();
+        if (response.status === 200) {
+          onLogin(json);
+        } else {
+          setErrorText(json.message);
+        }
+      } catch {
+        setErrorText("An unknown error occured.");
+      }
+    })();
+  }, [email, username, password, onLogin]);
+
   return (
     <main className="centered-content">
       <section className="centered-form-container">
-        <form method="get" action="/">
+        <form>
           <fieldset>
             <legend>Create an Account</legend>
+            {errorText !== null && (
+              <div className="mb-3">
+                <span className="error">{errorText}</span>
+              </div>
+            )}
             <div className="mb-3">
               <label className="form-label" htmlFor="user-email">
                 Email
@@ -64,10 +95,10 @@ export default function LoginPage({ onLogin }) {
             </div>
             <div>
               <input
-                type="submit"
+                type="button"
                 className={submitBtnClasses}
                 value="Register"
-                onClick={() => onLogin(email.split("@")[0])}
+                onClick={handleCreateAccount}
               />
               <Link to="/" className="btn btn-link">
                 Login instead
