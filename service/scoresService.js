@@ -47,12 +47,8 @@ async function publishScore(username, gameMode, scoreWPM) {
   );
 
   return {
-    didSetPersonalHighScore:
-      highScores.personal.length < NUM_SCORES_TO_USE ||
-      beatenGlobalScores.length > 0,
-    didSetGlobalHighScore:
-      globalScores.length < NUM_SCORES_TO_USE ||
-      beatenPersonalScores.length > 0,
+    didSetPersonalHighScore: beatenPersonalScores.length > 0,
+    didSetGlobalHighScore: beatenGlobalScores.length > 0,
   };
 }
 

@@ -11,12 +11,18 @@ export default function LoginPage({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const canSubmit = !(email === "" || password === "");
+
   let submitBtnClasses = "btn btn-primary";
-  if (email === "" || password === "") {
+  if (!canSubmit) {
     submitBtnClasses += " disabled";
   }
 
   const handleLogin = useCallback(() => {
+    if (!canSubmit) {
+      return;
+    }
+
     (async () => {
       setIsLoggingIn(true);
       try {
@@ -41,12 +47,21 @@ export default function LoginPage({ onLogin }) {
         setIsLoggingIn(false);
       }
     })();
-  }, [email, password, onLogin]);
+  }, [canSubmit, email, password, onLogin]);
+
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.key === "Enter") {
+        handleLogin();
+      }
+    },
+    [handleLogin]
+  );
 
   return (
     <main id="login" className="centered-content">
       <section className="centered-form-container">
-        <form>
+        <form onKeyDown={handleKeyDown}>
           <fieldset>
             <legend>Login</legend>
             {errorText !== null && (

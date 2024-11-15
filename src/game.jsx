@@ -6,8 +6,6 @@ import "./css/game.css";
 import Loader, { MainLoader } from "./Loader";
 import Notification from "./Notification";
 
-const minTimeMinutes = 5 / 60; // 5 Seconds
-
 const CHAR_VALID = "valid";
 const CHAR_EXTRA = "extra";
 const CHAR_INVALID = "invalid";
@@ -221,41 +219,50 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
     ];
   }, [fragments, promptParts]);
 
-  // Same number of words and the last word is fully typed or more typed words than prompt words.
-  const hasWinner =
-    (typedTextParts.length == promptParts.length &&
-      typedTextParts[typedTextParts.length - 1].length >=
-        promptParts[promptParts.length - 1].length) ||
-    typedTextParts.length > promptParts.length;
+  const [displayWPM, setDisplayWPM] = useState(0); // Debounced WPM displayed to the user
+  const [completeWPM, setCompleteWPM] = useState(-1); // WPM set on win
 
-  const [wpm, setWPM] = useState(0);
-
-  const updateWPM = useCallback(() => {
+  const instantaneousWPM = useMemo(() => {
     if (startTime === -1) {
       return;
     }
 
-    const numWordsCorrect = numCharsCorrect / 5;
+    const charDiff = Math.max(0, numCharsCorrect - numCharsIncorrect);
 
-    const dtMinuites = (Date.now() - startTime) / 1000 / 60;
+    const wordsDiff = charDiff / 5;
 
-    const clampedDTMinuites = Math.min(minTimeMinuites, dtMinuites);
+    const dtMinutes = (Date.now() - startTime) / 1000 / 60;
 
-    setWPM(numWordsCorrect / clampedDTMinuites);
-  }, [numCharsCorrect, startTime]);
+    return wordsDiff / dtMinutes;
+  }, [numCharsCorrect, numCharsIncorrect, startTime]);
+
+  const updateDisplayWPM = useCallback(() => {
+    setDisplayWPM(instantaneousWPM);
+  }, [instantaneousWPM]);
+
+  // Same number of words and the last word is fully typed or more typed words than prompt words.
+  const [hasWinner, setHasWinner] = useState(false);
+  const _hasWinner =
+    (typedTextParts.length == promptParts.length &&
+      typedTextParts[typedTextParts.length - 1].length >=
+        promptParts[promptParts.length - 1].length) ||
+    typedTextParts.length > promptParts.length;
+  if (!hasWinner && _hasWinner) {
+    setHasWinner(true);
+    setCompleteWPM(instantaneousWPM);
+  }
 
   // Update the WPM every second or when the typed text changes
   useEffect(() => {
     // Stop the timer and do a final WPM update on winner.
     if (hasWinner) {
-      updateWPM();
       return () => null;
     }
 
     let intervalId = -1;
 
     const updateLoop = () => {
-      updateWPM();
+      updateDisplayWPM();
       intervalId = window.setTimeout(updateLoop, 1000);
     };
 
@@ -268,7 +275,7 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
 
       window.clearTimeout(intervalId);
     };
-  }, [hasWinner, updateWPM]);
+  }, [hasWinner, updateDisplayWPM]);
 
   // Start the timer and recompute the WPM when the fragments change
   useEffect(() => {
@@ -276,7 +283,7 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
       setStartTime(Date.now());
     }
 
-    updateWPM();
+    updateDisplayWPM();
   }, [fragments, startTime]);
 
   const [motivationalMessage, setMotivationalMessage] = useState(null);
@@ -325,24 +332,22 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
     }
 
     const intervalId = window.setInterval(
-      () => updateMotivationalMessageRef.current(),
+      () => updateMotivationalMessage(),
       5000
     );
     return () => window.clearInterval(intervalId);
-  }, []);
+  }, [updateMotivationalMessage]);
 
-  if (hasWinner) {
+  if (hasWinner && completeWPM !== -1) {
     return (
       <div className="centered-content">
         <section className="centered-form-container">
           <h3>{MODE_TO_TEXT[gameMode]} Game Complete!</h3>
           <p>
-            Your score was {Math.round(wpm)} WPM with an accuracy of{" "}
+            Your score was {Math.round(completeWPM)} WPM with an accuracy of{" "}
             {Math.round(percentCorrect * 100)}%!
           </p>
-          <p>
-            <GameCompletionHighScore wpm={wpm} gameMode={gameMode} />
-          </p>
+          <GameCompletionHighScore wpm={completeWPM} gameMode={gameMode} />
 
           <div>
             <button
@@ -367,7 +372,7 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
         <div className="mb-3">
           <div>
             {Math.round(percentCorrect * 100)}% accuracy | WPM:{" "}
-            {Math.round(wpm)}
+            {Math.round(displayWPM)}
           </div>
         </div>
         <div className="mb-3">

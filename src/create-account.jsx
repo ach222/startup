@@ -10,12 +10,18 @@ export default function LoginPage({ onLogin }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
+  const canSubmit = !(email === "" || username === "" || password === "");
+
   let submitBtnClasses = "btn btn-primary";
-  if (email === "" || username === "" || password === "") {
+  if (!canSubmit) {
     submitBtnClasses += " disabled";
   }
 
   const handleCreateAccount = useCallback(() => {
+    if (!canSubmit) {
+      return;
+    }
+
     (async () => {
       setIsCreatingAccount(true);
       try {
@@ -40,12 +46,21 @@ export default function LoginPage({ onLogin }) {
         setIsCreatingAccount(false);
       }
     })();
-  }, [email, username, password, onLogin]);
+  }, [canSubmit, email, username, password, onLogin]);
+
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.key === "Enter") {
+        handleCreateAccount();
+      }
+    },
+    [handleCreateAccount]
+  );
 
   return (
     <main id="create-account" className="centered-content">
       <section className="centered-form-container">
-        <form>
+        <form onKeyDown={handleKeyDown}>
           <fieldset>
             <legend>Create an Account</legend>
             {errorText !== null && (
