@@ -57,9 +57,25 @@ authRouter.get("/", ensureLoggedInMiddleware, (req, res) => {
 
 authRouter.post("/register", async (req, res) => {
   const { email, username, password } = req.body;
-  if (email === undefined || username === undefined || password === undefined) {
+  if (
+    email === undefined ||
+    username === undefined ||
+    password === undefined ||
+    password === ""
+  ) {
     utils.sendBadRequest(res);
     return;
+  }
+
+  if (!utils.validateEmail(email)) {
+    utils.sendBadRequest(res, "Invalid email address!");
+  }
+
+  if (!utils.validateUsername(username)) {
+    utils.sendBadRequest(
+      res,
+      "A username must consist of alphanumeric characters and the special characters `-` and `_`."
+    );
   }
 
   if ((await userService.getUserByEmail(email)) !== null) {
@@ -87,9 +103,13 @@ authRouter.post("/register", async (req, res) => {
 authRouter.post("/", async (req, res) => {
   const { email, password } = req.body;
 
-  if (email === undefined || password === undefined) {
+  if (email === undefined || password === undefined || password === "") {
     utils.sendBadRequest(res);
     return;
+  }
+
+  if (!utils.validateEmail(email)) {
+    utils.sendBadRequest(res, "Invalid email address!");
   }
 
   const user = await userService.loginUser(email, password);
