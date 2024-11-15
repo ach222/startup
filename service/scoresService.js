@@ -34,7 +34,7 @@ async function getHighScores(username) {
 async function publishScore(username, gameMode, scoreWPM) {
   await scoresCollection.insertOne({ username, gameMode, scoreWPM });
 
-  const highScores = await getHighScores();
+  const highScores = await getHighScores(username);
 
   const globalScores =
     gameMode === MODE_EASY ? highScores.topEasy : highScores.topHard;
@@ -47,8 +47,11 @@ async function publishScore(username, gameMode, scoreWPM) {
   );
 
   return {
-    didSetPersonalHighScore: beatenPersonalScores.length > 0,
-    didSetGlobalHighScore: beatenGlobalScores.length > 0,
+    didSetPersonalHighScore:
+      highScores.personal.length < NUM_SCORES_TO_USE ||
+      beatenPersonalScores.length > 0,
+    didSetGlobalHighScore:
+      globalScores.length < NUM_SCORES_TO_USE || beatenGlobalScores.length > 0,
   };
 }
 

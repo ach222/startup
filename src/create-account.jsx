@@ -10,7 +10,12 @@ export default function LoginPage({ onLogin }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const canSubmit = !(email === "" || username === "" || password === "");
+  const canSubmit = !(
+    isCreatingAccount ||
+    email === "" ||
+    username === "" ||
+    password === ""
+  );
 
   let submitBtnClasses = "btn btn-primary";
   if (!canSubmit) {
@@ -40,7 +45,8 @@ export default function LoginPage({ onLogin }) {
         } else {
           setErrorText(json.message);
         }
-      } catch {
+      } catch (e) {
+        console.error(e);
         setErrorText("An unknown error occured.");
       } finally {
         setIsCreatingAccount(false);

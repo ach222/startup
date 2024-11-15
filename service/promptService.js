@@ -28,7 +28,7 @@ async function getRandomArticle(subdomain) {
 
   const result = {
     title: pageResult.title,
-    link: `https://en.wikipedia.org/wiki?curid=${pageId}`,
+    link: `https://${subdomain}.wikipedia.org/wiki?curid=${pageId}`,
     text: summary,
   };
 

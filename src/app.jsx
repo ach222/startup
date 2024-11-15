@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 
 import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle";
 import {
   BrowserRouter,
   Navigate,
@@ -31,7 +32,8 @@ export default function App() {
         } else {
           setAuthState({ isLoggedIn: false });
         }
-      } catch {
+      } catch (e) {
+        console.error(e);
         setAuthState({ isLoggedIn: false });
       }
     })();
@@ -48,9 +50,10 @@ export default function App() {
         if (response.status === 200) {
           setAuthState({ isLoggedIn: false });
         }
-      } catch {
-        // Do nothing
-        console.error("An error occured logging you out.");
+      } catch (e) {
+        console.error(e);
+        // Reload the window; something is wrong.
+        window.location.reload();
       }
     })();
   }, []);
@@ -96,7 +99,7 @@ export default function App() {
                     </li>
                     <li className="nav-item">
                       <NavLink to="scores" className="nav-link">
-                        Highscores
+                        High Scores
                       </NavLink>
                     </li>
                   </>

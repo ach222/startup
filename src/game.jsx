@@ -65,8 +65,8 @@ function Game({ gameMode, onComplete }) {
           setFetchError(json.message);
         }
       } catch (e) {
-        setFetchError("An unknown error occured.");
         console.error(e);
+        setFetchError("An unknown error occured.");
       }
     })();
   }, []);
@@ -126,10 +126,7 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
             charIndex < promptWord.length &&
             charIndex < typedTextWord.length
           ) {
-            if (
-              promptWord[charIndex].toLowerCase() ===
-              typedTextWord[charIndex].toLowerCase()
-            ) {
+            if (promptWord[charIndex] === typedTextWord[charIndex]) {
               fragment.push({
                 char: promptWord[charIndex],
                 type: CHAR_VALID,
@@ -222,23 +219,30 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
   const [displayWPM, setDisplayWPM] = useState(0); // Debounced WPM displayed to the user
   const [completeWPM, setCompleteWPM] = useState(-1); // WPM set on win
 
-  const instantaneousWPM = useMemo(() => {
-    if (startTime === -1) {
-      return;
-    }
+  const computeWPM = useCallback(
+    (nowMilliseconds) => {
+      if (startTime === -1) {
+        return 0;
+      }
 
-    const charDiff = Math.max(0, numCharsCorrect - numCharsIncorrect);
+      const charDiff = Math.max(0, numCharsCorrect - numCharsIncorrect);
 
-    const wordsDiff = charDiff / 5;
+      const wordsDiff = charDiff / 5;
 
-    const dtMinutes = (Date.now() - startTime) / 1000 / 60;
+      const dtMinutes = (nowMilliseconds - startTime) / 1000 / 60;
 
-    return wordsDiff / dtMinutes;
-  }, [numCharsCorrect, numCharsIncorrect, startTime]);
+      if (dtMinutes === 0) {
+        return 0;
+      }
+
+      return wordsDiff / dtMinutes;
+    },
+    [numCharsCorrect, numCharsIncorrect, startTime]
+  );
 
   const updateDisplayWPM = useCallback(() => {
-    setDisplayWPM(instantaneousWPM);
-  }, [instantaneousWPM]);
+    setDisplayWPM(computeWPM(Date.now()));
+  }, [computeWPM]);
 
   // Same number of words and the last word is fully typed or more typed words than prompt words.
   const [hasWinner, setHasWinner] = useState(false);
@@ -249,12 +253,12 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
     typedTextParts.length > promptParts.length;
   if (!hasWinner && _hasWinner) {
     setHasWinner(true);
-    setCompleteWPM(instantaneousWPM);
+    setCompleteWPM(computeWPM(Date.now()));
   }
 
   // Update the WPM every second or when the typed text changes
   useEffect(() => {
-    // Stop the timer and do a final WPM update on winner.
+    // Stop the timer
     if (hasWinner) {
       return () => null;
     }
@@ -284,7 +288,7 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
     }
 
     updateDisplayWPM();
-  }, [fragments, startTime]);
+  }, [fragments, startTime, updateDisplayWPM]);
 
   const [motivationalMessage, setMotivationalMessage] = useState(null);
 
@@ -323,20 +327,6 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
       window.clearTimeout(intervalId);
     };
   }, [hasWinner, updateMotivationalMessage]);
-
-  useEffect(() => {
-    // Stop the timer and hide the message on winner.
-    if (hasWinner) {
-      setMotivationalMessage(null);
-      return;
-    }
-
-    const intervalId = window.setInterval(
-      () => updateMotivationalMessage(),
-      5000
-    );
-    return () => window.clearInterval(intervalId);
-  }, [updateMotivationalMessage]);
 
   if (hasWinner && completeWPM !== -1) {
     return (
@@ -435,8 +425,8 @@ function GameCompletionHighScore({ wpm, gameMode }) {
           setSendScoresError(json.message);
         }
       } catch (e) {
-        setSendScoresError("An unknown error occured.");
         console.error(e);
+        setSendScoresError("An unknown error occured.");
       }
     })();
   }, []);
@@ -452,10 +442,10 @@ function GameCompletionHighScore({ wpm, gameMode }) {
   return (
     <>
       {didSetHighScores.didSetGlobalHighScore && (
-        <p>You set a new global high score!</p>
+        <p className="bold success">You set a new global high score!</p>
       )}
       {didSetHighScores.didSetPersonalHighScore && (
-        <p>You set a new personal high score!</p>
+        <p className="bold success">You set a new personal high score!</p>
       )}
       {!didSetHighScores.didSetGlobalHighScore &&
         !didSetHighScores.didSetPersonalHighScore && (

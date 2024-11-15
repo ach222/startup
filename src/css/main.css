@@ -7,6 +7,7 @@
     --color-valid: #00cc00;
     --color-invalid: #cc0000;
 
+    --color-success: #00cc00;
     --color-error: #cc0000;
 }
 
@@ -58,6 +59,11 @@ main {
     height: 100%;
 
     gap: 8px;
+}
+
+.centered-content.always-centered {
+    justify-content: center;
+    align-items: center;
 }
 
 @media (width >= 550px) and (height >= 550px) {
@@ -124,8 +130,16 @@ footer > span {
     text-decoration: none;
 }
 
+.bold {
+    font-weight: bold;
+}
+
 .error {
     color: var(--color-error);
+}
+
+.success {
+    color: var(--color-success);
 }
 
 .caption {

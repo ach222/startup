@@ -19,7 +19,8 @@ export default function ScoresPage() {
         } else {
           setErrorText("An unknown error occured.");
         }
-      } catch {
+      } catch (e) {
+        console.error(e);
         setErrorText("An unknown error occured.");
       }
     })();
@@ -74,7 +75,7 @@ function LoadedScoresPage({ highScores }) {
           <tbody>
             {uiPersonalHighScores.length === 0 ? (
               <tr>
-                <td colSpan={2}>No data.</td>
+                <td colSpan={2}>No data</td>
               </tr>
             ) : (
               uiPersonalHighScores
@@ -94,7 +95,7 @@ function LoadedScoresPage({ highScores }) {
           <tbody>
             {uiTopEasyHighScores.length === 0 ? (
               <tr>
-                <td colSpan={2}>No data.</td>
+                <td colSpan={2}>No data</td>
               </tr>
             ) : (
               uiTopEasyHighScores
@@ -114,7 +115,7 @@ function LoadedScoresPage({ highScores }) {
           <tbody>
             {uiTopHardHighScores.length === 0 ? (
               <tr>
-                <td colSpan={2}>No data.</td>
+                <td colSpan={2}>No data</td>
               </tr>
             ) : (
               uiTopHardHighScores

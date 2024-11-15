@@ -6,20 +6,21 @@ const userService = require("./authService");
 const authRouter = express.Router();
 
 const TOKEN_COOKIE_KEY = "token";
+const COOKIE_OPTIONS = {
+  secure: true,
+  httpOnly: true,
+  sameSite: "strict",
+};
 
 const BAD_EMAIL_MESSAGE =
-  "Invalid email address! Please use the format `<name>@<domain>.<tld>`.";
+  "Invalid email address! Please use the format `<name>@<domain>.<tld>`. Please note that `<tld>` must be a common top-level domain.";
 
 function deleteAuthCookie(res) {
-  return res.clearCookie(TOKEN_COOKIE_KEY);
+  return res.clearCookie(TOKEN_COOKIE_KEY, COOKIE_OPTIONS);
 }
 
 function setAuthCookie(res, sessionToken) {
-  res.cookie(TOKEN_COOKIE_KEY, sessionToken, {
-    secure: true,
-    httpOnly: true,
-    sameSite: "strict",
-  });
+  res.cookie(TOKEN_COOKIE_KEY, sessionToken, COOKIE_OPTIONS);
 }
 
 function getAuthCookie(req) {
@@ -121,7 +122,7 @@ authRouter.post("/", async (req, res) => {
   const user = await userService.loginUser(email, password);
 
   if (user === null) {
-    utils.sendUnauthorized(res, "Bad username and/or password.");
+    utils.sendUnauthorized(res, "Bad email and/or password.");
     return;
   }
 

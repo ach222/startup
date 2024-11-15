@@ -11,7 +11,7 @@ export default function LoginPage({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const canSubmit = !(email === "" || password === "");
+  const canSubmit = !(isLoggingIn || email === "" || password === "");
 
   let submitBtnClasses = "btn btn-primary";
   if (!canSubmit) {
@@ -41,7 +41,8 @@ export default function LoginPage({ onLogin }) {
         } else {
           setErrorText(json.message);
         }
-      } catch {
+      } catch (e) {
+        console.error(e);
         setErrorText("An unknown error occured.");
       } finally {
         setIsLoggingIn(false);

@@ -9,7 +9,7 @@ function sendBadRequest(res, message = undefined) {
 }
 
 function validateUsername(username) {
-  return /[A-Za-z0-9\-_]+/.test(username);
+  return /^[A-Za-z0-9\-_]+$/.test(username);
 }
 
 function validateEmail(email) {
