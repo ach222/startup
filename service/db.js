@@ -1,5 +1,5 @@
 const { MongoClient } = require("mongodb");
-const dbConfig = require("./secrets/dbconfig");
+const dbConfig = require("./dbConfig");
 
 const dbClient = new MongoClient(dbConfig.url);
 const startupDb = dbClient.db("startup");

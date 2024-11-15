@@ -78,3 +78,24 @@ React functionality has been added and application now functions (client-only).
   - [x] **Scores** - Static scores data is mocked out.
 - [x] **Router** - Pages are all routed using `react-router`.
 - [x] **Hooks** - Most pages use hooks, see `./src/game.jsx` for many of them. One example would be using `useState()` in `./src/app.jsx` to store login state.
+
+
+## Service Deliverable
+ExpressJS service has been implemented.
+
+- [x] **NodeJS express server** - Done!
+- [x] **Static files** - Served by ExpressJS!
+- [x] **Third-party endpoint** - Calls to [Wikipedia](https://wikipedia.org) proxied through service.
+- [x] **Backend service endpoints** - All endpoints implemented including login and score submission.
+- [x] **Frontend calls service endpoints** - All endpoints are called by the React code and function properly.
+
+
+## Login Deliverable
+Full login functionality and database functionality has been implemented.
+
+- [x] **MongoDB Atlas database created** - Done!
+- [x] **Data stored in database** - All data is stored an persistent.
+- [x] **User registration** - Implemented.
+- [x] **User login** - Implemented.
+- [x] **Credential storage** - Implemented.
+- [x] **Restricts functionality** - All non-auth endpoints are protected by login middleware.

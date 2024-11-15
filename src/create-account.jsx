@@ -107,7 +107,11 @@ export default function LoginPage({ onLogin }) {
                 className={submitBtnClasses}
                 onClick={handleCreateAccount}
               >
-                {isCreatingAccount ? <Loader /> : "Register"}
+                {isCreatingAccount ? (
+                  <Loader size="sm" boxSize="1em" />
+                ) : (
+                  "Register"
+                )}
               </button>
               <Link to="/" className="btn btn-link">
                 Login instead

@@ -7,6 +7,9 @@ const authRouter = express.Router();
 
 const TOKEN_COOKIE_KEY = "token";
 
+const BAD_EMAIL_MESSAGE =
+  "Invalid email address! Please use the format `<name>@<domain>.<tld>`.";
+
 function deleteAuthCookie(res) {
   return res.clearCookie(TOKEN_COOKIE_KEY);
 }
@@ -68,7 +71,8 @@ authRouter.post("/register", async (req, res) => {
   }
 
   if (!utils.validateEmail(email)) {
-    utils.sendBadRequest(res, "Invalid email address!");
+    utils.sendBadRequest(res, BAD_EMAIL_MESSAGE);
+    return;
   }
 
   if (!utils.validateUsername(username)) {
@@ -76,6 +80,7 @@ authRouter.post("/register", async (req, res) => {
       res,
       "A username must consist of alphanumeric characters and the special characters `-` and `_`."
     );
+    return;
   }
 
   if ((await userService.getUserByEmail(email)) !== null) {
@@ -109,7 +114,8 @@ authRouter.post("/", async (req, res) => {
   }
 
   if (!utils.validateEmail(email)) {
-    utils.sendBadRequest(res, "Invalid email address!");
+    utils.sendBadRequest(res, BAD_EMAIL_MESSAGE);
+    return;
   }
 
   const user = await userService.loginUser(email, password);
