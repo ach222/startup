@@ -57,13 +57,14 @@ async function loginUser(email, password) {
 
   const newSessionToken = newToken();
 
-  return await usersCollection.findOneAndUpdate(
+  await usersCollection.updateOne(
     { _id: resultingUser._id },
     {
       $set: { sessionToken: newSessionToken },
-    },
-    { returnDocument: "after" }
+    }
   );
+
+  return { ...resultingUser, sessionToken: newSessionToken };
 }
 
 async function logoutUser(sessionToken) {
