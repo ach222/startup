@@ -6,6 +6,8 @@ import "./css/game.css";
 import Loader, { MainLoader } from "./Loader";
 import Notification from "./Notification";
 
+const minTimeMinutes = 5 / 60; // 5 Seconds
+
 const CHAR_VALID = "valid";
 const CHAR_EXTRA = "extra";
 const CHAR_INVALID = "invalid";
@@ -19,7 +21,7 @@ export default function GamePage() {
   };
 
   return (
-    <main>
+    <main id="game">
       {selectedGameMode === null ? (
         <div className="centered-content">
           <section className="centered-form-container">
@@ -235,9 +237,11 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
 
     const numWordsCorrect = numCharsCorrect / 5;
 
-    const dtMin = (Date.now() - startTime) / 1000 / 60;
+    const dtMinuites = (Date.now() - startTime) / 1000 / 60;
 
-    setWPM(numWordsCorrect / dtMin);
+    const clampedDTMinuites = Math.min(minTimeMinuites, dtMinuites);
+
+    setWPM(numWordsCorrect / clampedDTMinuites);
   }, [numCharsCorrect, startTime]);
 
   // Update the WPM every second or when the typed text changes
@@ -380,12 +384,9 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
           />
         </div>
         <div>
-          <p>
-            {uiFragments}
-            <span className="text-typed"></span>
-          </p>
+          <p className="prompt">{uiFragments}</p>
           <p className="caption">
-            Text courtesy of <a href="https://wikimedia.org">Wikimedia</a>. This
+            Text courtesy of <a href="https://wikipedia.org">Wikipedia</a>. This
             excerpt comes from the article titled{" "}
             <a href={prompt.link}>{prompt.title}</a>.
           </p>

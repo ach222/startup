@@ -61,7 +61,7 @@ function LoadedScoresPage({ highScores }) {
     ));
 
   return (
-    <main className="padded-content">
+    <main id="scores" className="padded-content">
       <section>
         <h3>Personal High Scores</h3>
         <table className="table table-bordered">

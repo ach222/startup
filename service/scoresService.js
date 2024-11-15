@@ -1,7 +1,7 @@
 const { startupDb } = require("./db");
 const { MODE_EASY, MODE_HARD } = require("./constants");
 
-const NUM_SCORES_TO_USE = 10;
+const NUM_SCORES_TO_USE = 5;
 const SCORE_SORT = { scoreWPM: -1 };
 
 const scoresCollection = startupDb.collection("scores");

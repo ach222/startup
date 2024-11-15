@@ -4,7 +4,7 @@ import "./css/about.css";
 
 export default function AboutPage() {
   return (
-    <main className="padded-content">
+    <main id="about" className="padded-content">
       <section>
         <p>
           <img

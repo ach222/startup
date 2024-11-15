@@ -1,4 +1,4 @@
-main {
+main#game {
     position: relative;
     overflow: hidden;
 }
@@ -11,6 +11,10 @@ div.game-mode-selection-container {
 
 input[type="text"]#typing-input {
     width: 100%;
+}
+
+p.prompt {
+    user-select: none; /* Prevent users from copy/pasting. */
 }
 
 span.text {

@@ -12,8 +12,7 @@ promptRouter.get("/", async (req, res) => {
   const { gameMode } = req.query;
   if (
     gameMode === undefined ||
-    gameMode !== MODE_EASY ||
-    gameMode !== MODE_HARD
+    !(gameMode === MODE_EASY || gameMode === MODE_HARD)
   ) {
     utils.sendBadRequest(res);
     return;

@@ -44,7 +44,7 @@ export default function LoginPage({ onLogin }) {
   }, [email, password, onLogin]);
 
   return (
-    <main className="centered-content">
+    <main id="login" className="centered-content">
       <section className="centered-form-container">
         <form>
           <fieldset>

@@ -16,8 +16,7 @@ scoresRouter.post("/", async (req, res) => {
   if (
     gameMode === undefined ||
     scoreWPM === undefined ||
-    gameMode !== MODE_EASY ||
-    gameMode !== MODE_HARD ||
+    !(gameMode === MODE_EASY || gameMode === MODE_HARD) ||
     scoreWPM < 0
   ) {
     utils.sendBadRequest(res);

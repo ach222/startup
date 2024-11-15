@@ -43,7 +43,7 @@ export default function LoginPage({ onLogin }) {
   }, [email, username, password, onLogin]);
 
   return (
-    <main className="centered-content">
+    <main id="create-account" className="centered-content">
       <section className="centered-form-container">
         <form>
           <fieldset>
