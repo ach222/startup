@@ -50,6 +50,7 @@ export default function GamePage() {
 }
 
 function Game({ gameMode, onComplete }) {
+  const [promptFetchError, setFetchError] = useState(null);
   const [prompt, setPrompt] = useState(null);
 
   // Load the prompt (HTTP mock).
@@ -61,13 +62,18 @@ function Game({ gameMode, onComplete }) {
         if (response.status === 200) {
           setPrompt(json);
         } else {
-          console.error("An unknown error occured.");
+          setFetchError(json.message);
         }
-      } catch {
-        console.error("An unknown error occured.");
+      } catch (e) {
+        setFetchError("An unknown error occured.");
+        console.error(e);
       }
     })();
   }, []);
+
+  if (promptFetchError !== null) {
+    return <div className="error">{promptFetchError}</div>;
+  }
 
   if (prompt === null) {
     return <MainLoader />;
@@ -400,6 +406,7 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
  * Tells the player if they have beaten any high scores.
  */
 function GameCompletionHighScore({ wpm, gameMode }) {
+  const [sendScoresError, setSendScoresError] = useState(null);
   const [didSetHighScores, setDidSetHighScores] = useState(null);
 
   // Submit score
@@ -419,13 +426,18 @@ function GameCompletionHighScore({ wpm, gameMode }) {
         if (response.status === 200) {
           setDidSetHighScores(json);
         } else {
-          console.error("An unknown error occured.");
+          setSendScoresError(json.message);
         }
-      } catch {
-        console.error("An unknown error occured.");
+      } catch (e) {
+        setSendScoresError("An unknown error occured.");
+        console.error(e);
       }
     })();
   }, []);
+
+  if (sendScoresError !== null) {
+    return <div className="error">{sendScoresError}</div>;
+  }
 
   if (didSetHighScores === null) {
     return <Loader />;

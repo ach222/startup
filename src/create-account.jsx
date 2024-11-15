@@ -1,7 +1,9 @@
 import React, { useCallback, useState } from "react";
 import { Link } from "react-router-dom";
+import Loader from "./Loader";
 
 export default function LoginPage({ onLogin }) {
+  const [isCreatingAccount, setIsCreatingAccount] = useState(false);
   const [errorText, setErrorText] = useState(null);
 
   const [email, setEmail] = useState("");
@@ -15,6 +17,7 @@ export default function LoginPage({ onLogin }) {
 
   const handleCreateAccount = useCallback(() => {
     (async () => {
+      setIsCreatingAccount(true);
       try {
         const response = await fetch("/api/auth/register", {
           method: "POST",
@@ -33,6 +36,8 @@ export default function LoginPage({ onLogin }) {
         }
       } catch {
         setErrorText("An unknown error occured.");
+      } finally {
+        setIsCreatingAccount(false);
       }
     })();
   }, [email, username, password, onLogin]);
@@ -59,6 +64,7 @@ export default function LoginPage({ onLogin }) {
                 name="user-email"
                 placeholder="Email"
                 required
+                disabled={isCreatingAccount}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -74,6 +80,7 @@ export default function LoginPage({ onLogin }) {
                 name="user-name"
                 placeholder="Username"
                 required
+                disabled={isCreatingAccount}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
@@ -89,17 +96,19 @@ export default function LoginPage({ onLogin }) {
                 name="user-password"
                 placeholder="Password"
                 required
+                disabled={isCreatingAccount}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             <div>
-              <input
+              <button
                 type="button"
                 className={submitBtnClasses}
-                value="Register"
                 onClick={handleCreateAccount}
-              />
+              >
+                {isCreatingAccount ? <Loader /> : "Register"}
+              </button>
               <Link to="/" className="btn btn-link">
                 Login instead
               </Link>

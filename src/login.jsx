@@ -2,8 +2,10 @@ import React, { useCallback, useState } from "react";
 
 import { Link } from "react-router-dom";
 import "./css/login.css";
+import Loader from "./Loader";
 
 export default function LoginPage({ onLogin }) {
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [errorText, setErrorText] = useState(null);
 
   const [email, setEmail] = useState("");
@@ -16,6 +18,7 @@ export default function LoginPage({ onLogin }) {
 
   const handleLogin = useCallback(() => {
     (async () => {
+      setIsLoggingIn(true);
       try {
         const response = await fetch("/api/auth", {
           method: "POST",
@@ -34,6 +37,8 @@ export default function LoginPage({ onLogin }) {
         }
       } catch {
         setErrorText("An unknown error occured.");
+      } finally {
+        setIsLoggingIn(false);
       }
     })();
   }, [email, password, onLogin]);
@@ -60,6 +65,7 @@ export default function LoginPage({ onLogin }) {
                 name="user-email"
                 placeholder="Email"
                 required
+                disabled={isLoggingIn}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -75,17 +81,19 @@ export default function LoginPage({ onLogin }) {
                 name="user-password"
                 placeholder="Password"
                 required
+                disabled={isLoggingIn}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             <div>
-              <input
+              <button
                 type="button"
                 className={submitBtnClasses}
-                value="Login"
                 onClick={handleLogin}
-              />
+              >
+                {isLoggingIn ? <Loader /> : "Login"}
+              </button>
               <Link to="/create-account" className="btn btn-link">
                 Create an Account
               </Link>
