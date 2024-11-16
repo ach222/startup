@@ -3,13 +3,9 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { MODE_EASY, MODE_HARD, MODE_TO_TEXT } from "./constants";
 import "./css/game.css";
+import { computeGameState, computeWPM } from "./gameLogic";
 import Loader, { MainLoader } from "./Loader";
 import Notification from "./Notification";
-
-const CHAR_VALID = "valid";
-const CHAR_EXTRA = "extra";
-const CHAR_INVALID = "invalid";
-const CHAR_UNTYPED = "untyped";
 
 export default function GamePage() {
   const [selectedGameMode, setSelectedGameMode] = useState(null);
@@ -90,86 +86,20 @@ function Game({ gameMode, onComplete }) {
 
 function GameWithPrompt({ gameMode, prompt, onComplete }) {
   const [startTime, setStartTime] = useState(-1);
-
-  const promptParts = useMemo(
-    () => prompt.text.split(" ").filter((it) => it !== ""),
-    [prompt.text]
-  );
-
   const [typedText, setTypedText] = useState("");
-  const typedTextParts = useMemo(
-    () => typedText.split(" ").filter((it) => it !== ""),
-    [typedText]
-  );
-
-  const fragments = useMemo(() => {
-    const fragments = [];
-
-    for (
-      let wordIndex = 0;
-      wordIndex < Math.max(promptParts.length, typedTextParts.length);
-      wordIndex++
-    ) {
-      let fragment = [];
-      // Handle non-extra words
-      if (wordIndex < promptParts.length && wordIndex < typedTextParts.length) {
-        const promptWord = promptParts[wordIndex];
-        const typedTextWord = typedTextParts[wordIndex];
-
-        for (
-          let charIndex = 0;
-          charIndex < Math.max(promptWord.length, typedTextWord.length);
-          charIndex++
-        ) {
-          // Handle non-extra chars
-          if (
-            charIndex < promptWord.length &&
-            charIndex < typedTextWord.length
-          ) {
-            if (promptWord[charIndex] === typedTextWord[charIndex]) {
-              fragment.push({
-                char: promptWord[charIndex],
-                type: CHAR_VALID,
-              });
-            } else {
-              fragment.push({
-                char: promptWord[charIndex],
-                type: CHAR_INVALID,
-              });
-            }
-          }
-          // Handle extra chars
-          else if (charIndex < promptWord.length) {
-            fragment.push({ char: promptWord[charIndex], type: CHAR_UNTYPED });
-          } else if (charIndex < typedTextWord.length) {
-            fragment.push({ char: typedTextWord[charIndex], type: CHAR_EXTRA });
-          }
-        }
-      }
-      // Handle extra words
-      else if (wordIndex < promptParts.length) {
-        fragment = Array.from(promptParts[wordIndex]).map((char) => ({
-          char,
-          type: CHAR_UNTYPED,
-        }));
-      } else if (wordIndex < typedTextParts.length) {
-        fragment = Array.from(typedTextParts[wordIndex]).map((char) => ({
-          char,
-          type: CHAR_EXTRA,
-        }));
-      }
-
-      fragments.push(fragment);
-    }
-
-    return fragments;
-  }, [typedTextParts, promptParts]);
+  const [gameStateObject, setGameStateObject] = useState(
+    computeGameState(prompt.text, "")
+  ); // Game state; see the return value for `computeGameState`.
+  const [displayWPM, setDisplayWPM] = useState(0); // Debounced WPM displayed to the user
+  const [hasWinner, setHasWinner] = useState(false);
+  const [completeWPM, setCompleteWPM] = useState(-1); // WPM set on win
+  const [motivationalMessage, setMotivationalMessage] = useState(null); // Popup message
 
   const uiFragments = useMemo(() => {
     const components = [];
 
     let fragIdx = 0;
-    for (const fragment of fragments) {
+    for (const fragment of gameStateObject.fragments) {
       let charIdx = 0;
       for (const charData of fragment) {
         components.push(
@@ -189,108 +119,50 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
     }
 
     return components;
-  }, [fragments]);
-
-  const [numCharsCorrect, numCharsIncorrect, percentCorrect] = useMemo(() => {
-    let numCharsCorrect = 0;
-    let numCharsIncorrect = 0;
-    for (const charData of fragments.flat()) {
-      if (charData.type === CHAR_VALID) {
-        numCharsCorrect++;
-      } else if (
-        charData.type === CHAR_INVALID ||
-        charData.type === CHAR_EXTRA
-      ) {
-        numCharsIncorrect++;
-      }
-    }
-
-    if (numCharsCorrect + numCharsIncorrect === 0) {
-      return [numCharsCorrect, numCharsIncorrect, 0];
-    }
-
-    return [
-      numCharsCorrect,
-      numCharsIncorrect,
-      numCharsCorrect / (numCharsCorrect + numCharsIncorrect),
-    ];
-  }, [fragments, promptParts]);
-
-  const [displayWPM, setDisplayWPM] = useState(0); // Debounced WPM displayed to the user
-  const [completeWPM, setCompleteWPM] = useState(-1); // WPM set on win
-
-  const computeWPM = useCallback(
-    (nowMilliseconds) => {
-      if (startTime === -1) {
-        return 0;
-      }
-
-      const charDiff = Math.max(0, numCharsCorrect - numCharsIncorrect);
-
-      const wordsDiff = charDiff / 5;
-
-      const dtMinutes = (nowMilliseconds - startTime) / 1000 / 60;
-
-      if (dtMinutes === 0) {
-        return 0;
-      }
-
-      return wordsDiff / dtMinutes;
-    },
-    [numCharsCorrect, numCharsIncorrect, startTime]
-  );
-
-  const updateDisplayWPM = useCallback(() => {
-    setDisplayWPM(computeWPM(Date.now()));
-  }, [computeWPM]);
-
-  // Same number of words and the last word is fully typed or more typed words than prompt words.
-  const [hasWinner, setHasWinner] = useState(false);
-  const _hasWinner =
-    (typedTextParts.length == promptParts.length &&
-      typedTextParts[typedTextParts.length - 1].length >=
-        promptParts[promptParts.length - 1].length) ||
-    typedTextParts.length > promptParts.length;
-  if (!hasWinner && _hasWinner) {
-    setHasWinner(true);
-    setCompleteWPM(computeWPM(Date.now()));
-  }
+  }, [gameStateObject.fragments]);
 
   // Update the WPM every second or when the typed text changes
-  useEffect(() => {
-    // Stop the timer
-    if (hasWinner) {
-      return () => null;
-    }
-
-    let intervalId = -1;
-
-    const updateLoop = () => {
-      updateDisplayWPM();
-      intervalId = window.setTimeout(updateLoop, 1000);
-    };
-
-    intervalId = window.setTimeout(updateLoop, 1000);
-
-    return () => {
-      if (intervalId === -1) {
-        return;
+  useEffect(
+    () => {
+      // Stop the timer
+      if (hasWinner) {
+        return () => null;
       }
 
-      window.clearTimeout(intervalId);
-    };
-  }, [hasWinner, updateDisplayWPM]);
+      let intervalId = -1;
 
-  // Start the timer and recompute the WPM when the fragments change
-  useEffect(() => {
-    if (startTime === -1) {
-      setStartTime(Date.now());
-    }
+      const updateLoop = () => {
+        const { numCharsCorrect, numCharsIncorrect } = gameStateObject;
+        const wpm = computeWPM(
+          startTime,
+          Date.now(),
+          numCharsCorrect,
+          numCharsIncorrect
+        );
 
-    updateDisplayWPM();
-  }, [fragments, startTime, updateDisplayWPM]);
+        setDisplayWPM(wpm);
 
-  const [motivationalMessage, setMotivationalMessage] = useState(null);
+        intervalId = window.setTimeout(updateLoop, 1000);
+      };
+
+      intervalId = window.setTimeout(updateLoop, 1000);
+
+      return () => {
+        if (intervalId === -1) {
+          return;
+        }
+
+        window.clearTimeout(intervalId);
+      };
+    },
+    [
+      hasWinner,
+      startTime,
+      gameStateObject.numCharsCorrect,
+      gameStateObject.numCharsIncorrect,
+    ],
+    gameStateObject
+  );
 
   // Websocket mock
   const updateMotivationalMessage = useCallback(() => {
@@ -328,6 +200,38 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
     };
   }, [hasWinner, updateMotivationalMessage]);
 
+  const handleTypedTextChange = useCallback(
+    (e) => {
+      let _startTime = startTime;
+      if (startTime === -1) {
+        _startTime = Date.now();
+        setStartTime(_startTime);
+      }
+
+      const newText = e.target.value;
+      const newGameState = computeGameState(prompt.text, newText);
+      const { numCharsCorrect, numCharsIncorrect, hasWinner } = newGameState;
+
+      const wpm = computeWPM(
+        _startTime,
+        Date.now(),
+        numCharsCorrect,
+        numCharsIncorrect
+      );
+
+      setTypedText(newText);
+      setGameStateObject(newGameState);
+      setDisplayWPM(wpm);
+
+      // Handle winner
+      if (hasWinner) {
+        setHasWinner(true);
+        setCompleteWPM(wpm);
+      }
+    },
+    [startTime, prompt.text]
+  );
+
   if (hasWinner && completeWPM !== -1) {
     return (
       <div className="centered-content">
@@ -335,7 +239,7 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
           <h3>{MODE_TO_TEXT[gameMode]} Game Complete!</h3>
           <p>
             Your score was {Math.round(completeWPM)} WPM with an accuracy of{" "}
-            {Math.round(percentCorrect * 100)}%!
+            {Math.round(gameStateObject.accuracy * 100)}%!
           </p>
           <GameCompletionHighScore wpm={completeWPM} gameMode={gameMode} />
 
@@ -361,7 +265,7 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
       <section>
         <div className="mb-3">
           <div>
-            {Math.round(percentCorrect * 100)}% accuracy | WPM:{" "}
+            {Math.round(gameStateObject.accuracy * 100)}% accuracy | WPM:{" "}
             {Math.round(displayWPM)}
           </div>
         </div>
@@ -375,7 +279,7 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
             autoFocus
             autoComplete="off"
             value={typedText}
-            onChange={(e) => setTypedText(e.target.value)}
+            onChange={handleTypedTextChange}
           />
         </div>
         <div>
