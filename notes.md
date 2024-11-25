@@ -138,3 +138,16 @@ div {
 * `app.listen(<port>);`
 * `app.<method>((req, res, next) => void);`
 * Middleware - `app.use()` - `(req, res, next) => void`, `(error, req, res, next) => void`, `express.static(<dir>)`
+
+### Cookies
+* Set - `res.cookie(<key>, <value>, <options>)`
+* Clear - `res.clearCookie(<key>, <options>)`
+* Get - `req.cookies[<key>]`
+
+### Mongo
+* `const client = new MongoClient(<url>)`
+* `await client.connect();`
+* `const collection = client.collection(<collection_name>);`
+* `await collection.insertOne(...)`
+* `await collection.findOne(...)`
+* `await collection.updateOne(...)`
