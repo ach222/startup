@@ -13,6 +13,10 @@ input[type="text"]#typing-input {
     width: 100%;
 }
 
+div.score {
+    color: #444444;
+}
+
 p.prompt {
     user-select: none; /* Prevent users from copy/pasting. */
 }

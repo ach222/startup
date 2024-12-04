@@ -43,7 +43,13 @@ export function computeGameState(promptText, typedText) {
         }
         // Handle extra chars
         else if (charIndex < promptWord.length) {
-          fragment.push({ char: promptWord[charIndex], type: CHAR_UNTYPED });
+          if (typedTextParts.length - 1 === wordIndex) {
+            // Current word, leave as untyped.
+            fragment.push({ char: promptWord[charIndex], type: CHAR_UNTYPED });
+          } else {
+            // Word is in the past; mark all as incorrect
+            fragment.push({ char: promptWord[charIndex], type: CHAR_INVALID });
+          }
         } else if (charIndex < typedTextWord.length) {
           fragment.push({ char: typedTextWord[charIndex], type: CHAR_EXTRA });
         }

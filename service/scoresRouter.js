@@ -1,14 +1,14 @@
 const express = require("express");
 
 const { ensureLoggedInMiddleware } = require("./authRouter");
-const { getHighScores, publishScore } = require("./scoresService");
+const { getHighScoresFormatted, publishScore } = require("./scoresService");
 const { MODE_EASY, MODE_HARD } = require("./constants");
 
 const scoresRouter = express.Router();
 scoresRouter.use(ensureLoggedInMiddleware);
 
 scoresRouter.get("/", async (req, res) => {
-  res.send(await getHighScores(req.loggedInUser.username));
+  res.send(await getHighScoresFormatted(req.loggedInUser.username));
 });
 
 scoresRouter.post("/", async (req, res) => {

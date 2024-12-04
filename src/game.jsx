@@ -199,7 +199,7 @@ function GameWithPrompt({ authState, gameMode, prompt, onComplete }) {
 
         return (
           <span>
-            <span className="bold">{username}</span> just started a{" "}
+            <span className="bold">{username}</span> just started{" "}
             <span className="bold">
               {MODE_TO_TEXT_SINGLE_SENTENCE[gameMode]}
             </span>{" "}
@@ -308,9 +308,13 @@ function GameWithPrompt({ authState, gameMode, prompt, onComplete }) {
     <div className="padded-content">
       <section>
         <div className="mb-3">
-          <div>
-            {Math.round(gameStateObject.accuracy * 100)}% accuracy | WPM:{" "}
-            {Math.round(displayWPM)}
+          <div className="score">
+            {startTime === -1
+              ? "Start typing to start the game..."
+              : `
+                ${Math.round(
+                  gameStateObject.accuracy * 100
+                )}% accuracy | WPM: ${Math.round(displayWPM)}`}
           </div>
         </div>
         <div className="mb-3">
@@ -319,7 +323,7 @@ function GameWithPrompt({ authState, gameMode, prompt, onComplete }) {
             id="typing-input"
             className="form-control"
             name="typing-input"
-            placeholder="Start Typing!"
+            placeholder="Start typing the prompt below!"
             autoFocus
             autoComplete="off"
             value={typedText}

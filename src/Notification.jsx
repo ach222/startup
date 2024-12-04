@@ -9,7 +9,7 @@ export default function Notification({ text, onClose }) {
           Close
         </a>
       </div>
-      <div className="js-placeholder">{text}</div>
+      <div>{text}</div>
     </div>
   );
 }

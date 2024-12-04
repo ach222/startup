@@ -82,6 +82,9 @@ export default function useMotivationalMessageWebSocket(isActive, currentWPM) {
     }
 
     const ws = new WebSocket("/api/scores-ws");
+
+    ws.addEventListener("open", () => console.debug("Websocket opened!"));
+
     ws.addEventListener("message", (e) => {
       const message = JSON.parse(e.data);
       updateMotivationalMessageRef.current(message);
@@ -89,7 +92,7 @@ export default function useMotivationalMessageWebSocket(isActive, currentWPM) {
 
     ws.addEventListener("error", (e) => console.error("Websocket error!", e));
 
-    ws.addEventListener("close", (e) => console.error("Websocket closed!", e));
+    ws.addEventListener("close", () => console.debug("Websocket closed!"));
 
     return () => {
       ws.close();

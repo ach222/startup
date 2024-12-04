@@ -14,7 +14,19 @@ async function ensureDB() {
   }
 }
 
+/** Copies a list of objects and removes a key from each one. */
+function withoutFieldFromIterableObjects(iterable, key) {
+  const iterableCopy = structuredClone(iterable);
+
+  for (const item of iterableCopy) {
+    delete iterable[key];
+  }
+
+  return iterableCopy;
+}
+
 module.exports = {
   startupDb,
   ensureDB,
+  withoutFieldFromIterableObjects,
 };
