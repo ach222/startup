@@ -1,19 +1,24 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Link } from "react-router-dom";
-import { MODE_EASY, MODE_HARD, MODE_TO_TEXT } from "./constants";
+import {
+  MODE_EASY,
+  MODE_HARD,
+  MODE_TO_TEXT,
+  MODE_TO_TEXT_SINGLE_SENTENCE,
+} from "./constants";
 import "./css/game.css";
 import { computeGameState, computeWPM } from "./gameLogic";
 import Loader, { MainLoader } from "./Loader";
 import Notification from "./Notification";
-import useScoreWebSocket, {
+import useMotivationalMessageWebSocket, {
   MESSAGE_GAME_COMPLETE,
   MESSAGE_GAME_START,
-} from "./useScoreWebSocket";
+} from "./useMotivationalMessageWebSocket";
 
 const WPM_TIE_MARGIN = 5;
 
-export default function GamePage() {
+export default function GamePage({ authState }) {
   const [selectedGameMode, setSelectedGameMode] = useState(null);
 
   const onNewGame = () => {
@@ -45,13 +50,17 @@ export default function GamePage() {
           </section>
         </div>
       ) : (
-        <Game gameMode={selectedGameMode} onComplete={onNewGame} />
+        <Game
+          authState={authState}
+          gameMode={selectedGameMode}
+          onComplete={onNewGame}
+        />
       )}
     </main>
   );
 }
 
-function Game({ gameMode, onComplete }) {
+function Game({ authState, gameMode, onComplete }) {
   const [promptFetchError, setFetchError] = useState(null);
   const [prompt, setPrompt] = useState(null);
 
@@ -83,6 +92,7 @@ function Game({ gameMode, onComplete }) {
 
   return (
     <GameWithPrompt
+      authState={authState}
       prompt={prompt}
       gameMode={gameMode}
       onComplete={onComplete}
@@ -90,7 +100,7 @@ function Game({ gameMode, onComplete }) {
   );
 }
 
-function GameWithPrompt({ gameMode, prompt, onComplete }) {
+function GameWithPrompt({ authState, gameMode, prompt, onComplete }) {
   const [startTime, setStartTime] = useState(-1);
   const [typedText, setTypedText] = useState("");
   const [gameStateObject, setGameStateObject] = useState(
@@ -170,7 +180,7 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
   );
 
   const [motivationalMessageState, clearMotivationalMessage] =
-    useScoreWebSocket(!hasWinner, displayWPM);
+    useMotivationalMessageWebSocket(!hasWinner, displayWPM);
 
   const uiMotivationalMessage = useMemo(() => {
     if (motivationalMessageState === null) {
@@ -179,24 +189,43 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
 
     switch (motivationalMessageState.type) {
       case MESSAGE_GAME_START:
-        const { username, gameMode } = motivationalMessageState.data;
+        const { username: rawUsername, gameMode } =
+          motivationalMessageState.data;
+
+        const username =
+          authState.username === rawUsername
+            ? "You (seemingly in another tab)"
+            : rawUsername;
 
         return (
           <span>
             <span className="bold">{username}</span> just started a{" "}
-            <span className="bold">{MODE_TO_TEXT[gameMode].toLowerCase()}</span>{" "}
+            <span className="bold">
+              {MODE_TO_TEXT_SINGLE_SENTENCE[gameMode]}
+            </span>{" "}
             game. The competition is heating up!
           </span>
         );
       case MESSAGE_GAME_COMPLETE: {
-        const { myWPM, username, gameMode, scoreWPM } =
-          motivationalMessageState.data;
+        const {
+          myWPM,
+          username: rawUsername,
+          gameMode,
+          scoreWPM,
+        } = motivationalMessageState.data;
+
+        const username =
+          authState.username === rawUsername
+            ? "You (seemingly in another tab)"
+            : rawUsername;
 
         const completedFrag = (
           <>
             <span className="bold">{username}</span> just completed a game with
             a score of <span className="bold">{Math.round(scoreWPM)}</span> on{" "}
-            <span className="bold">{MODE_TO_TEXT[gameMode].toLowerCase()}</span>
+            <span className="bold">
+              {MODE_TO_TEXT_SINGLE_SENTENCE[gameMode]}
+            </span>
             !
           </>
         );
@@ -206,16 +235,14 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
         } else if (myWPM < scoreWPM - WPM_TIE_MARGIN) {
           return <span>{completedFrag} Better go faster!</span>;
         } else {
-          return (
-            <span>{completedFrag}. You're neck and neck! Keep it up!</span>
-          );
+          return <span>{completedFrag} You're neck and neck! Keep it up!</span>;
         }
       }
 
       default:
         return null;
     }
-  }, [motivationalMessageState]);
+  }, [motivationalMessageState, authState.username]);
 
   const handleTypedTextChange = useCallback(
     (e) => {

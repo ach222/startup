@@ -5,7 +5,7 @@ export const MESSAGE_GAME_COMPLETE = "game_complete";
 
 const MESSAGE_AUTO_CLOSE_SECONDS = 5;
 
-export default function useScoreWebSocket(isActive, currentWPM) {
+export default function useMotivationalMessageWebSocket(isActive, currentWPM) {
   const [motivationalMessageState, setMotivationalMessageState] =
     useState(null); // Popup message
   const hideTimerRef = useRef(-1);
@@ -28,7 +28,8 @@ export default function useScoreWebSocket(isActive, currentWPM) {
 
   const startCloseTimer = useCallback(() => {
     if (hideTimerRef.current !== -1) {
-      return;
+      window.clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = -1;
     }
 
     hideTimerRef.current = window.setTimeout(() => {
@@ -73,6 +74,7 @@ export default function useScoreWebSocket(isActive, currentWPM) {
   );
 
   const updateMotivationalMessageRef = useRef(updateMotivationalMessage);
+  updateMotivationalMessageRef.current = updateMotivationalMessage;
 
   useEffect(() => {
     if (!isActive) {

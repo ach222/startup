@@ -36,6 +36,14 @@ app.locals.scoresWebSocketManager = new WebSocketManager(
   "/api/scores-ws"
 );
 
+server.on("listening", () => {
+  app.locals.scoresWebSocketManager.start();
+});
+
+server.on("close", () => {
+  app.locals.scoresWebSocketManager.stop();
+});
+
 server.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });

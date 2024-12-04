@@ -145,9 +145,29 @@ div {
 * Get - `req.cookies[<key>]`
 
 ### Mongo
-* `const client = new MongoClient(<url>)`
+* `const client = new MongoClient(<url>);`
 * `await client.connect();`
 * `const collection = client.collection(<collection_name>);`
 * `await collection.insertOne(...)`
 * `await collection.findOne(...)`
 * `await collection.updateOne(...)`
+
+### WebSockets
+#### Server
+* `const wss = new WebSocketServer({...options});`
+* `wss.on("<event>", <callback>);`
+  * connection
+  * pong
+  * error
+  * close
+* `wss.send(<data>);`
+* `wss.ping();`
+
+#### Client
+* `const ws = new WebSocket(<path>);`
+* `ws.on("<event>", <callback>);`
+  * open
+  * data
+  * error
+  * close
+* `ws.send(<data>);`

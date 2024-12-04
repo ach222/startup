@@ -23,7 +23,7 @@ export default function Loader({ size, boxSize }) {
  */
 export function MainLoader({ ...props }) {
   return (
-    <main className="centered-content">
+    <main className="centered-content always-centered">
       <section>
         <Loader {...props} />
       </section>

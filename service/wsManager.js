@@ -27,6 +27,10 @@ class WebSocketManager {
       clientObject.isAlive = true;
     });
 
+    ws.on("error", (e) => {
+      console.error(`An error occured in websocket with uuid "${uuid}"!`, e);
+    });
+
     ws.on("close", () => {
       delete this.clients[uuid];
     });
@@ -43,13 +47,13 @@ class WebSocketManager {
         continue;
       }
 
-      client.alive = false;
+      client.isAlive = false;
       client.ws.ping();
     }
 
-    for (const uuidToRemove of toRemove.values()) {
-      this.clients[uuidToRemove].ws.terminate();
-      delete this.clients[uuidToRemove];
+    for (const clientToRemove of toRemove.values()) {
+      clientToRemove.ws.terminate();
+      delete this.clients[clientToRemove.uuid];
     }
   }
 
