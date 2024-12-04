@@ -1,10 +1,12 @@
 const express = require("express");
+const { createServer } = require("http");
 const cookieParser = require("cookie-parser");
 
 const { ensureDB } = require("./db");
 const { authRouter } = require("./authRouter");
 const { scoresRouter } = require("./scoresRouter");
 const { promptRouter } = require("./promptRouter");
+const { WebSocketManager } = require("./wsManager");
 
 ensureDB();
 
@@ -28,6 +30,12 @@ app.use(express.static("public"));
 // Redirect all not found endpoints to `index.html`
 app.use("*", express.static("public/index.html"));
 
-app.listen(port, () => {
+const server = createServer(app);
+app.locals.scoresWebSocketManager = new WebSocketManager(
+  server,
+  "/api/scores-ws"
+);
+
+server.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });

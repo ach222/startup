@@ -6,6 +6,12 @@ import "./css/game.css";
 import { computeGameState, computeWPM } from "./gameLogic";
 import Loader, { MainLoader } from "./Loader";
 import Notification from "./Notification";
+import useScoreWebSocket, {
+  MESSAGE_GAME_COMPLETE,
+  MESSAGE_GAME_START,
+} from "./useScoreWebSocket";
+
+const WPM_TIE_MARGIN = 5;
 
 export default function GamePage() {
   const [selectedGameMode, setSelectedGameMode] = useState(null);
@@ -93,7 +99,6 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
   const [displayWPM, setDisplayWPM] = useState(0); // Debounced WPM displayed to the user
   const [hasWinner, setHasWinner] = useState(false);
   const [completeWPM, setCompleteWPM] = useState(-1); // WPM set on win
-  const [motivationalMessage, setMotivationalMessage] = useState(null); // Popup message
 
   const uiFragments = useMemo(() => {
     const components = [];
@@ -164,41 +169,53 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
     gameStateObject
   );
 
-  // Websocket mock
-  const updateMotivationalMessage = useCallback(() => {
-    if (motivationalMessage === null) {
-      setMotivationalMessage(
-        'This is a motivational message! Placeholder: WebSocket (sample notification; "encouraging" score goes here)'
-      );
-    } else {
-      setMotivationalMessage(null);
-    }
-  }, [motivationalMessage]);
+  const [motivationalMessageState, clearMotivationalMessage] =
+    useScoreWebSocket(!hasWinner, displayWPM);
 
-  useEffect(() => {
-    // Stop the timer and hide the message on winner.
-    if (hasWinner) {
-      setMotivationalMessage(null);
-      return () => null;
+  const uiMotivationalMessage = useMemo(() => {
+    if (motivationalMessageState === null) {
+      return null;
     }
 
-    let intervalId = -1;
+    switch (motivationalMessageState.type) {
+      case MESSAGE_GAME_START:
+        const { username, gameMode } = motivationalMessageState.data;
 
-    const updateLoop = () => {
-      updateMotivationalMessage();
-      intervalId = window.setTimeout(updateLoop, 5000);
-    };
+        return (
+          <span>
+            <span className="bold">{username}</span> just started a{" "}
+            <span className="bold">{MODE_TO_TEXT[gameMode].toLowerCase()}</span>{" "}
+            game. The competition is heating up!
+          </span>
+        );
+      case MESSAGE_GAME_COMPLETE: {
+        const { myWPM, username, gameMode, scoreWPM } =
+          motivationalMessageState.data;
 
-    intervalId = window.setTimeout(updateLoop, 5000);
+        const completedFrag = (
+          <>
+            <span className="bold">{username}</span> just completed a game with
+            a score of <span className="bold">{Math.round(scoreWPM)}</span> on{" "}
+            <span className="bold">{MODE_TO_TEXT[gameMode].toLowerCase()}</span>
+            !
+          </>
+        );
 
-    return () => {
-      if (intervalId === -1) {
-        return;
+        if (myWPM > scoreWPM + WPM_TIE_MARGIN) {
+          return <span>{completedFrag} You're crushing it!</span>;
+        } else if (myWPM < scoreWPM - WPM_TIE_MARGIN) {
+          return <span>{completedFrag} Better go faster!</span>;
+        } else {
+          return (
+            <span>{completedFrag}. You're neck and neck! Keep it up!</span>
+          );
+        }
       }
 
-      window.clearTimeout(intervalId);
-    };
-  }, [hasWinner, updateMotivationalMessage]);
+      default:
+        return null;
+    }
+  }, [motivationalMessageState]);
 
   const handleTypedTextChange = useCallback(
     (e) => {
@@ -292,10 +309,10 @@ function GameWithPrompt({ gameMode, prompt, onComplete }) {
         </div>
       </section>
 
-      {motivationalMessage !== null && (
+      {uiMotivationalMessage !== null && (
         <Notification
-          text={motivationalMessage}
-          onClose={() => setMotivationalMessage(null)}
+          text={uiMotivationalMessage}
+          onClose={clearMotivationalMessage}
         />
       )}
     </div>

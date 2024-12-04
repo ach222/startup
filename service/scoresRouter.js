@@ -23,6 +23,13 @@ scoresRouter.post("/", async (req, res) => {
     return;
   }
 
+  // Broadcast the score to everyone
+  req.app.locals.scoresWebSocketManager.broadcastGameComplete(
+    req.loggedInUser.username,
+    gameMode,
+    scoreWPM
+  );
+
   res.send(await publishScore(req.loggedInUser.username, gameMode, scoreWPM));
 });
 

@@ -3,11 +3,11 @@ import { defineConfig } from "vite";
 export default defineConfig({
   server: {
     proxy: {
-      "/api": "http://localhost:3000",
-      "/api/ws": {
-        target: "ws://localhost:3000/api/ws",
+      "/api/scores-ws": {
+        target: "ws://localhost:3000",
         ws: true,
       },
+      "/api": "http://localhost:3000",
     },
   },
 });

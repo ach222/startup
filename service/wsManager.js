@@ -1,18 +1,21 @@
 const { WebSocketServer } = require("ws");
-const uuid = require("uuid");
+const { v4: uuid4 } = require("uuid");
 
 class WebSocketManager {
   clients = {};
 
-  constructor() {
-    this.wss = WebSocketServer({ noServer: true });
+  static #MESSAGE_GAME_START = "game_start";
+  static #MESSAGE_GAME_COMPLETE = "game_complete";
+
+  constructor(server, path) {
+    this.wss = new WebSocketServer({ server, path });
     this.pingIntervalHook = -1;
 
     this.wss.on("connection", this.#handleNewClient.bind(this));
   }
 
   #handleNewClient(ws) {
-    const uuid = uuid.v4();
+    const uuid = uuid4();
 
     const clientObject = {
       uuid,
@@ -34,7 +37,7 @@ class WebSocketManager {
   #keepAlive() {
     const toRemove = new Set();
 
-    for (const client of self.clients) {
+    for (const client of Object.values(this.clients)) {
       if (!client.isAlive) {
         toRemove.add(client);
         continue;
@@ -45,8 +48,8 @@ class WebSocketManager {
     }
 
     for (const uuidToRemove of toRemove.values()) {
-      self.clients[uuidToRemove].ws.terminate();
-      delete self.clients[uuidToRemove];
+      this.clients[uuidToRemove].ws.terminate();
+      delete this.clients[uuidToRemove];
     }
   }
 
@@ -71,10 +74,29 @@ class WebSocketManager {
     this.pingIntervalHook = -1;
   }
 
+  /** Notify all clients of a game start. */
+  broadcastGameStart(username, gameMode) {
+    for (const { ws } of Object.values(this.clients)) {
+      ws.send(
+        JSON.stringify({
+          type: WebSocketManager.#MESSAGE_GAME_START,
+          data: { username, gameMode },
+        })
+      );
+    }
+  }
+
   /** Notify all clients of a new highscore. */
-  broadcastHighScore(highScore) {
-    for (const { ws } of self.clients) {
-      ws.send(JSON.stringify(highScore));
+  broadcastGameComplete(username, gameMode, scoreWPM) {
+    for (const { ws } of Object.values(this.clients)) {
+      ws.send(
+        JSON.stringify({
+          type: WebSocketManager.#MESSAGE_GAME_COMPLETE,
+          data: { username, gameMode, scoreWPM },
+        })
+      );
     }
   }
 }
+
+module.exports = { WebSocketManager };

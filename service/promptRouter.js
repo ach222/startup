@@ -18,7 +18,15 @@ promptRouter.get("/", async (req, res) => {
     return;
   }
 
-  res.send(await getArticle(gameMode));
+  const article = await getArticle(gameMode);
+
+  // Broadcast the game start to everyone
+  req.app.locals.scoresWebSocketManager.broadcastGameStart(
+    req.loggedInUser.username,
+    gameMode
+  );
+
+  res.send(article);
 });
 
 module.exports = { promptRouter };
