@@ -101,14 +101,10 @@ Full login functionality and database functionality has been implemented.
 - [x] **Restricts functionality** - All non-auth endpoints are protected by login middleware.
 
 ## WebSocket Deliverable
-Full websocket functionality has been implemented.
+Full websocket functionality has been implemented. Application is fully functional.
 
 - [x] **Backend listens for websocket connections** - Done!
 - [x] **Frontend makes websocket connection** - Done!
 - [x] **Data sent over the websocket connection** - Done! Messages are sent when another user starts or completes a game.
 - [x] **Data sent over websocket connection displayed** - Done! Notifications are shown when another user starts or completes a game.
-
-## Final Deliverable
-Application is fully functional.
-
-- [x] **Application is fully functional** - Done!
+- [x] **Application is fully functional; all components are visible and functional** - Done!
