@@ -107,4 +107,4 @@ Full websocket functionality has been implemented. Application is fully function
 - [x] **Frontend makes websocket connection** - Done!
 - [x] **Data sent over the websocket connection** - Done! Messages are sent when another user starts or completes a game.
 - [x] **Data sent over websocket connection displayed** - Done! Notifications are shown when another user starts or completes a game.
-- [x] **Application is fully functional; all visible elements are functional** - Done!
+- [x] **All visible elements are functional; application is fully functional** - Done!
