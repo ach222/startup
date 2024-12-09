@@ -335,7 +335,12 @@ function GameWithPrompt({ authState, gameMode, prompt, onComplete }) {
           <p className="caption">
             Text courtesy of <a href="https://wikipedia.org">Wikipedia</a>. This
             excerpt comes from the article titled{" "}
-            <a href={prompt.link}>{prompt.title}</a>.
+            <a href={prompt.link}>{prompt.title}</a>. Small modifications were
+            made to the text to ensure simplicity. Please refer to{" "}
+            <a href="https://en.wikipedia.org/wiki/Wikipedia:Copyrights">
+              wikipedia.org
+            </a>{" "}
+            for copyright information.
           </p>
         </div>
       </section>

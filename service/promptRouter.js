@@ -18,15 +18,21 @@ promptRouter.get("/", async (req, res) => {
     return;
   }
 
-  const article = await getArticle(gameMode);
+  // Sometimes errors occur with getting prompts; handle them here.
+  try {
+    const article = await getArticle(gameMode);
 
-  // Broadcast the game start to everyone
-  req.app.locals.scoresWebSocketManager.broadcastGameStart(
-    req.loggedInUser.username,
-    gameMode
-  );
+    // Broadcast the game start to everyone
+    req.app.locals.scoresWebSocketManager.broadcastGameStart(
+      req.loggedInUser.username,
+      gameMode
+    );
 
-  res.send(article);
+    res.send(article);
+  } catch (e) {
+    console.error(e);
+    utils.sendInternalServerError();
+  }
 });
 
 module.exports = { promptRouter };
