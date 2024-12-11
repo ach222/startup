@@ -1,6 +1,6 @@
 # TinyType
 
-![TinyType Logo](./resources/logo.png)
+![TinyType Logo](./resources/logo-with-bg.png)
 
 ## Access the Project
 [https://startup.cs260fullstack.click](https://startup.cs260fullstack.click)
@@ -94,11 +94,16 @@ ExpressJS service has been implemented.
 Full login functionality and database functionality has been implemented.
 
 - [x] **MongoDB Atlas database created** - Done!
-- [x] **Data stored in database** - All data is stored an persistent.
+- [x] **Data stored in database** - All data is stored and persistent.
 - [x] **User registration** - Implemented.
 - [x] **User login** - Implemented.
 - [x] **Credential storage** - Implemented.
 - [x] **Restricts functionality** - All non-auth endpoints are protected by login middleware.
+
+## Login Deliverable \(Regrade Requested - 12/11/24\)
+A bug in the scores service \(introduced after initial submission\), intended to keep the database small and free from high scores that would not be displayed, prevented a user's high score from being saved if it was not a global high score. The high score would be saved in the mongo database, then immediately deleted \(by accident\). The erronious code has since been lost to a force push. The new code in [scoresService.js](https://github.com/ach222/startup/blob/b44eecbbf19ea02d39ebaa74eec221e28a4dc3fc/service/scoresService.js#L47) has fixed this issue, and now properly keeps the database small and free from high scores that would not be displayed.
+
+- [x] **Data stored in database** - All data is stored and persistent. High scores now save properly.
 
 ## WebSocket Deliverable
 Full websocket functionality has been implemented. Application is fully functional.
